@@ -50,6 +50,13 @@ class MiHumidifier {
       .getCharacteristic(Characteristic.CurrentRelativeHumidity)
       .on('get', this.getCurrentRelativeHumidity.bind(this))
 
+    // Target relative humidity
+    // This Characteristic cannot be viewed in the Home.app, but it can be changed using Siri Voice Commands or by using some 3rd Party HomeKit apps.
+    this.service
+      .addCharacteristic(Characteristic.TargetRelativeHumidity)
+      .on('get', this.getTargetRelativeHumidity.bind(this))
+      .on('set', this.setTargetRelativeHumidity.bind(this))    
+
     // Rotation speed
     this.service
       .getCharacteristic(Characteristic.RotationSpeed)
@@ -153,6 +160,30 @@ class MiHumidifier {
       callback(null, humidity)
     } catch (e) {
       this.log.error('getCurrentRelativeHumidity', e)
+      callback(e)
+    }
+  }
+
+  async getTargetRelativeHumidity(callback) {
+    try {
+      const [ limit_hum ] = await this.device.call('get_prop', ['limit_hum'])
+      callback(null, limit_hum)
+    } catch (e) {
+      this.log.error('getTargetRelativeHumidity', e)
+      callback(e)
+    }
+  }
+
+  async setTargetRelativeHumidity(value, callback) {
+    try {
+      const [ result ] = await this.device.call('set_limit_hum', [value])
+
+      if (result !== 'ok')
+        throw new Error(result)
+
+      callback()
+    } catch (e) {
+      this.log.error('setTargetRelativeHumidity', e)
       callback(e)
     }
   }
