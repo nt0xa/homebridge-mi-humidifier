@@ -57,6 +57,12 @@ class MiHumidifier {
       .on('get', this.getTargetRelativeHumidity.bind(this))
       .on('set', this.setTargetRelativeHumidity.bind(this))    
 
+    // Current water level (remaining water level)
+    // This characteristic works for zhimi.humidifier.ca1 SmartMi Evaporative Humidifier, should work for zhimi.humidifier.v1
+    this.service
+      .getCharacteristic(Characteristic.WaterLevel)
+      .on('get', this.getWaterLevel.bind(this))
+    
     // Rotation speed
     this.service
       .getCharacteristic(Characteristic.RotationSpeed)
@@ -187,6 +193,17 @@ class MiHumidifier {
       callback(e)
     }
   }
+  
+  //Test: for accurate water level reading in HomeKit. callback(null, waterLevel / 0.12)??
+  async getWaterLevel(callback) {
+    try {
+      const [ waterLevel ] = await this.device.call('get_prop', ['depth'])
+      callback(null, waterLevel / 1.2)
+    } catch (e) {
+      this.log.error('getWaterLevel', e)
+      callback(e)
+    }
+  }  
 
   async getRotationSpeed(callback) {
     try {
