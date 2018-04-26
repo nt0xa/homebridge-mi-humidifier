@@ -58,7 +58,8 @@ class MiHumidifier {
       .on('set', this.setTargetRelativeHumidity.bind(this))    
 
     // Current water level (remaining water level)
-    // This characteristic works for zhimi.humidifier.ca1 SmartMi Evaporative Humidifier, should work for zhimi.humidifier.v1
+    // This characteristic works for zhimi.humidifier.ca1 SmartMi Evaporative Humidifier
+    // zhimi.humidifier.v1 will always display 0% Water Level because it lacks a 'depth' property in miio
     this.service
       .getCharacteristic(Characteristic.WaterLevel)
       .on('get', this.getWaterLevel.bind(this))
@@ -67,7 +68,7 @@ class MiHumidifier {
     this.service
       .getCharacteristic(Characteristic.RotationSpeed)
       .setProps({
-        minValue: 0, // idle
+        minValue: 0, // auto - for zhimi.humidifier.ca1
         maxValue: 3, // high
         minStep: 1,
       })
@@ -208,7 +209,7 @@ class MiHumidifier {
   async getRotationSpeed(callback) {
     try {
       const modeToSpeed = {
-        'idle':   0,
+        'auto':   0,
         'silent': 1,
         'medium': 2,
         'high':   3,
@@ -236,7 +237,7 @@ class MiHumidifier {
       if (value > 0) {
         [ result ] = await this.device.call('set_mode', [speedToMode[value]])
       } else {
-        [ result ] = await this.device.call('set_power', ['off'])
+        [ result ] = await this.device.call('set_mode', ['auto'])
       }
 
       if (result !== 'ok')
