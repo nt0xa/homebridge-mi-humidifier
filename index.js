@@ -18,7 +18,7 @@ class MiHumidifier {
     this.model = config.model || 'v1'
     this.showTemperature = config.showTemperature || false
     this.nameTemperature = config.nameTemperature || 'Temperature'
-    this.showWaterLevel = config.showWaterLevel || false
+    //this.showWaterLevel = config.showWaterLevel || false
 
     this.services = []
 
@@ -62,7 +62,7 @@ class MiHumidifier {
     // Current water level (remaining water level)
     // This characteristic works for zhimi.humidifier.ca1 SmartMi Evaporative Humidifier
     // zhimi.humidifier.v1 will always display 0% Water Level because it lacks a 'depth' property in miio
-    if (this.showWaterLevel) {
+    if (this.model = 'ca1') {
       this.service
         .getCharacteristic(Characteristic.WaterLevel)
         .on('get', this.getWaterLevel.bind(this))
