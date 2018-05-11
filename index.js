@@ -15,6 +15,7 @@ class MiHumidifier {
     this.ip = config.ip
     this.token = config.token
     this.name = config.name || 'Humidifier'
+    this.model = config.model || 'v1'
     this.showTemperature = config.showTemperature || false
     this.nameTemperature = config.nameTemperature || 'Temperature'
 
@@ -57,11 +58,19 @@ class MiHumidifier {
       .on('get', this.getTargetRelativeHumidity.bind(this))
       .on('set', this.setTargetRelativeHumidity.bind(this))    
 
+    // Current water level (remaining water level)
+    // This characteristic works for zhimi.humidifier.ca1 SmartMi Evaporative Humidifier
+    if (this.model = 'ca1') {
+      this.service
+        .getCharacteristic(Characteristic.WaterLevel)
+        .on('get', this.getWaterLevel.bind(this))
+    }
+    
     // Rotation speed
     this.service
       .getCharacteristic(Characteristic.RotationSpeed)
       .setProps({
-        minValue: 0, // idle
+        minValue: 0, // auto - for zhimi.humidifier.ca1
         maxValue: 3, // high
         minStep: 1,
       })
@@ -187,11 +196,21 @@ class MiHumidifier {
       callback(e)
     }
   }
+  
+  async getWaterLevel(callback) {
+    try {
+      const [ waterLevel ] = await this.device.call('get_prop', ['depth'])
+      callback(null, waterLevel / 1.2)
+    } catch (e) {
+      this.log.error('getWaterLevel', e)
+      callback(e)
+    }
+  }  
 
   async getRotationSpeed(callback) {
     try {
       const modeToSpeed = {
-        'idle':   0,
+        'auto':   0,
         'silent': 1,
         'medium': 2,
         'high':   3,
@@ -219,7 +238,11 @@ class MiHumidifier {
       if (value > 0) {
         [ result ] = await this.device.call('set_mode', [speedToMode[value]])
       } else {
-        [ result ] = await this.device.call('set_power', ['off'])
+        if (this.model = 'ca1') {
+          [ result ] = await this.device.call('set_mode', ['auto'])
+        } else {
+          [ result ] = await this.device.call('set_power', ['off'])
+        }
       }
 
       if (result !== 'ok')
