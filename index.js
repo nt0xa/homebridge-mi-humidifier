@@ -16,10 +16,8 @@ class MiHumidifier {
     this.token = config.token
     this.name = config.name || 'Humidifier'
     this.model = config.model || 'v1'
-    //this.version = config.model || 'v1'
     this.showTemperature = config.showTemperature || false
     this.nameTemperature = config.nameTemperature || 'Temperature'
-    //this.showWaterLevel = config.showWaterLevel || false
 
     this.services = []
 
@@ -62,8 +60,7 @@ class MiHumidifier {
 
     // Current water level (remaining water level)
     // This characteristic works for zhimi.humidifier.ca1 SmartMi Evaporative Humidifier
-    // zhimi.humidifier.v1 will always display 0% Water Level because it lacks a 'depth' property in miio
-    if (this.model = 'ca1') {//if (this.version = 'ca1') {
+    if (this.model = 'ca1') {
       this.service
         .getCharacteristic(Characteristic.WaterLevel)
         .on('get', this.getWaterLevel.bind(this))
@@ -200,7 +197,6 @@ class MiHumidifier {
     }
   }
   
-  //Test: for accurate water level reading in HomeKit. callback(null, waterLevel / 0.12)??
   async getWaterLevel(callback) {
     try {
       const [ waterLevel ] = await this.device.call('get_prop', ['depth'])
@@ -242,7 +238,7 @@ class MiHumidifier {
       if (value > 0) {
         [ result ] = await this.device.call('set_mode', [speedToMode[value]])
       } else {
-        if (this.model = 'ca1') {//if (this.version = 'ca1') {
+        if (this.model = 'ca1') {
           [ result ] = await this.device.call('set_mode', ['auto'])
         } else {
           [ result ] = await this.device.call('set_power', ['off'])
