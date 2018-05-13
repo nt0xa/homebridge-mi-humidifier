@@ -56,16 +56,16 @@ class MiHumidifier {
     this.service
       .addCharacteristic(Characteristic.TargetRelativeHumidity)
       .on('get', this.getTargetRelativeHumidity.bind(this))
-      .on('set', this.setTargetRelativeHumidity.bind(this))    
+      .on('set', this.setTargetRelativeHumidity.bind(this))
 
     // Current water level (remaining water level)
     // This characteristic works for zhimi.humidifier.ca1 SmartMi Evaporative Humidifier
-    if (this.model = 'ca1') {
+    if (this.model === 'ca1') {
       this.service
         .getCharacteristic(Characteristic.WaterLevel)
         .on('get', this.getWaterLevel.bind(this))
     }
-    
+
     // Rotation speed
     this.service
       .getCharacteristic(Characteristic.RotationSpeed)
@@ -196,7 +196,7 @@ class MiHumidifier {
       callback(e)
     }
   }
-  
+
   async getWaterLevel(callback) {
     try {
       const [ waterLevel ] = await this.device.call('get_prop', ['depth'])
@@ -205,7 +205,7 @@ class MiHumidifier {
       this.log.error('getWaterLevel', e)
       callback(e)
     }
-  }  
+  }
 
   async getRotationSpeed(callback) {
     try {
@@ -238,7 +238,7 @@ class MiHumidifier {
       if (value > 0) {
         [ result ] = await this.device.call('set_mode', [speedToMode[value]])
       } else {
-        if (this.model = 'ca1') {
+        if (this.model === 'ca1') {
           [ result ] = await this.device.call('set_mode', ['auto'])
         } else {
           [ result ] = await this.device.call('set_power', ['off'])
