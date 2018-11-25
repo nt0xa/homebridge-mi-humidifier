@@ -110,7 +110,8 @@ class MiHumidifier {
     try {
       this.device = await miio.device({ address: this.ip, token: this.token })
     } catch (e) {
-      this.log.error(e)
+      this.log.error('Fail to discover the device. Retry in 1 minute', e)
+      setTimeout(() => { this.discover() }, 60000)
     }
   }
 
