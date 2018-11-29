@@ -1,49 +1,59 @@
 {
-	"pluginAlias": "MiHumidifier",
-	"pluginType": "accessory",
-	"schema": {
-		"type": "object",
-		"properties": {
-			"name":{
-				"title": "Name",
-				"type": "string",
-				"default": "Bedroom Humidifier",
-				"minLength": 1,
-				"required": true
-			},
-			"ip":{
-				"title": "IP",
-				"type": "string",
-				"required": true
-			},
-			"token":{
-				"title": "Token",
-				"type": "string",
-				"required": true
-			},
-			"model":{
-				"title": "Model",
-				"type": "string",
-				"default": "v1",
-				"oneOf": [
-					{"title": "v1", "enum": ["v1"] },
-					{"title": "ca1", "enum": ["ca1"] }
-				],
-				"required": true
-			},
-			"showTemperature":{
-				"title": "Show Temperature",
-				"type": "boolean",
-				"default": true,
-				"required": true
-			},
-			"nameTemperature":{
-				"title": "Name Temperature",
-				"type": "string",
-				"default": "Bedroom Temperature 1",
-				"minLength": 1,
-				"required": true
-			}
-		}
-	}
+  "pluginAlias": "MiHumidifier",
+  "pluginType": "accessory",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "default": "Bedroom Humidifier",
+        "minLength": 1,
+        "required": true
+      },
+      "ip": {
+        "title": "IP",
+        "type": "string",
+        "required": true
+      },
+      "token": {
+        "title": "Token",
+        "type": "string",
+        "required": true
+      },
+      "model": {
+        "title": "Model",
+        "type": "string",
+        "default": "v1",
+        "oneOf": [
+          {
+            "title": "v1",
+            "enum": [
+              "v1"
+            ]
+          },
+          {
+            "title": "ca1",
+            "enum": [
+              "ca1"
+            ]
+          }
+        ],
+        "required": true
+      },
+      "showTemperature": {
+        "title": "Show Temperature",
+        "type": "boolean",
+        "default": true,
+        "required": true
+      },
+      "nameTemperature": {
+        "title": "Name Temperature",
+        "type": "string",
+        "default": "Bedroom Temperature 1",
+        "minLength": 1,
+        "required": true
+      }
+    }
+  }
 }
