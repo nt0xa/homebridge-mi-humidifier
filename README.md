@@ -9,7 +9,7 @@ A Xiaomi Mi humidifier plugin for Homebridge.
 
 ```json
 {
-  "bridge": { w
+  "bridge": {
     "name": "Homebridge",
     "username": "CC:22:3D:E4:CE:30",
     "port": 51826,
