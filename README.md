@@ -1,6 +1,6 @@
 # homebridge-mi-humidifier
 
-![version](https://img.shields.io/npm/v/homebridge-mi-humidifier.svg)
+[![version](https://img.shields.io/npm/v/homebridge-mi-humidifier.svg)](https://www.npmjs.com/package/homebridge-mi-humidifier)
 ![downloads](https://img.shields.io/npm/dt/homebridge-mi-humidifier.svg)
 
 A Xiaomi Mi humidifier plugin for Homebridge.
