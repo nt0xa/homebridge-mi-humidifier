@@ -53,6 +53,19 @@
         "default": "Bedroom Temperature 1",
         "minLength": 1,
         "required": true
+      },
+      "showHumidity": {
+        "title": "Show Humidity",
+        "type": "boolean",
+        "default": true,
+        "required": true
+      },
+      "nameHumidity": {
+        "title": "Name Humidity",
+        "type": "string",
+        "default": "Bedroom Humidity",
+        "minLength": 1,
+        "required": true
       }
     }
   }
