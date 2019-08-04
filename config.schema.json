@@ -7,9 +7,8 @@
       "name": {
         "title": "Name",
         "type": "string",
-        "default": "Bedroom Humidifier",
-        "minLength": 1,
-        "required": true
+        "default": "Humidifier",
+        "minLength": 1
       },
       "ip": {
         "title": "IP",
@@ -19,53 +18,49 @@
       "token": {
         "title": "Token",
         "type": "string",
+        "pattern": "^[a-f\\d]{32}$",
         "required": true
       },
       "model": {
         "title": "Model",
         "type": "string",
-        "default": "v1",
         "oneOf": [
           {
             "title": "v1",
-            "enum": [
-              "v1"
-            ]
+            "enum": ["v1"]
           },
           {
             "title": "ca1",
-            "enum": [
-              "ca1"
-            ]
+            "enum": ["ca1"]
           }
         ],
         "required": true
       },
-      "showTemperature": {
-        "title": "Show Temperature",
-        "type": "boolean",
-        "default": true,
-        "required": true
+      "temperature": {
+        "title": "Temperature sensor",
+        "type": ["boolean", "object"],
+        "default": false,
+        "properties": {
+          "name": {
+            "title": "Sensor name",
+            "type": "string",
+            "minLength": 1,
+            "default": "Temperature"
+          }
+        }
       },
-      "nameTemperature": {
-        "title": "Name Temperature",
-        "type": "string",
-        "default": "Bedroom Temperature 1",
-        "minLength": 1,
-        "required": true
-      },
-      "showHumidity": {
-        "title": "Show Humidity",
-        "type": "boolean",
-        "default": true,
-        "required": true
-      },
-      "nameHumidity": {
-        "title": "Name Humidity",
-        "type": "string",
-        "default": "Bedroom Humidity",
-        "minLength": 1,
-        "required": true
+      "humidity": {
+        "title": "Humidity sensor",
+        "type": ["boolean", "object"],
+        "default": false,
+        "properties": {
+          "name": {
+            "title": "Sensor name",
+            "type": "string",
+            "minLength": 1,
+            "default": "Humidity"
+          }
+        }
       }
     }
   }
