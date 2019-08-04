@@ -17,7 +17,9 @@ class MiHumidifier {
     this.name = config.name || 'Humidifier'
     this.model = config.model || 'v1'
     this.showTemperature = config.showTemperature || false
+    this.showHumidity = config.showHumidity || false
     this.nameTemperature = config.nameTemperature || 'Temperature'
+    this.nameHumidity = config.nameHumidity || 'Humidity'
 
     this.services = []
 
@@ -70,8 +72,8 @@ class MiHumidifier {
     this.service
       .getCharacteristic(Characteristic.RotationSpeed)
       .setProps({
-        minValue: 0, // auto - for zhimi.humidifier.ca1
-        maxValue: 3, // high
+        minValue: 0, // 0 - turn off
+        maxValue: this.model === 'ca1' ? 4 : 3, // auto - for zhimi.humidifier.ca1 
         minStep: 1,
       })
       .on('get', this.getRotationSpeed.bind(this))
@@ -98,6 +100,17 @@ class MiHumidifier {
 
       this.services.push(this.temperatureSensorService);
     }
+
+    //Humidity
+    if (this.showHumidity){
+      this.humiditySensorService = new Service.HumiditySensor(this.nameHumidity);
+      this.humiditySensorService
+        .getCharacteristic(Characteristic.CurrentRelativeHumidity)
+        .on('get', this.getCurrentRelativeHumidity.bind(this));
+      
+      this.services.push(this.humiditySensorService);
+    }
+    
 
     this.discover()
   }
@@ -211,7 +224,7 @@ class MiHumidifier {
   async getRotationSpeed(callback) {
     try {
       const modeToSpeed = {
-        'auto':   0,
+        'auto':   4,
         'silent': 1,
         'medium': 2,
         'high':   3,
@@ -235,15 +248,19 @@ class MiHumidifier {
       }
 
       let result
-
+      const [ power ] = await this.device.call('get_prop', ['power'])
       if (value > 0) {
-        [ result ] = await this.device.call('set_mode', [speedToMode[value]])
-      } else {
-        if (this.model === 'ca1') {
-          [ result ] = await this.device.call('set_mode', ['auto'])
-        } else {
-          [ result ] = await this.device.call('set_power', ['off'])
+        if (power === 'off') {
+          await this.device.call('set_power', ['on'])
         }
+        if (value < 4) {
+          [ result ] = await this.device.call('set_mode', [speedToMode[value]])
+        }
+        if (value === 4 && this.model === 'ca1') {
+          [ result ] = await this.device.call('set_mode', ['auto'])
+        }
+      } else {
+         [ result ] = await this.device.call('set_power', ['off'])
       }
 
       if (result !== 'ok')
