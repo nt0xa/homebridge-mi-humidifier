@@ -253,7 +253,7 @@ class MiHumidifier {
         if (power === 'off') {
           await this.device.call('set_power', ['on'])
         }
-        if (value < 4){
+        if (value < 4) {
          [ result ] = await this.device.call('set_mode', [speedToMode[value]])
         }
         if(value === 4 && this.model === 'ca1'){
