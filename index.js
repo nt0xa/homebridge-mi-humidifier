@@ -249,7 +249,7 @@ class MiHumidifier {
 
       let result
       const [ power ] = await this.device.call('get_prop', ['power'])
-      if (value > 0){
+      if (value > 0) {
         if (power === 'off') {
           await this.device.call('set_power', ['on'])
         }
