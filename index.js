@@ -83,6 +83,12 @@ class MiHumidifier {
             .on('get', this.getRotationSpeed.bind(this))
             .on('set', this.setRotationSpeed.bind(this));
 
+        // Child lock
+        device
+            .addCharacteristic(Characteristic.LockPhysicalControls)
+            .on('get', this.getLockPhysicalControls.bind(this))
+            .on('set', this.setLockPhysicalControls.bind(this));
+
         // Temperature sensor
         if (options.temperature) {
             let temperature = new Service.TemperatureSensor(options.temperature.name || 'Temperature');
@@ -250,6 +256,34 @@ class MiHumidifier {
             callback(null, temperature / 10);
         } catch (err) {
             this.log.error('getCurrentTemperature', err);
+            callback(err);
+        }
+    }
+
+    async getLockPhysicalControls(callback) {
+        try {
+            const [locked] = await this.device.call('get_prop', ['child_lock']),
+                state = locked === 'on' ?
+                    Characteristic.LockPhysicalControls.CONTROL_LOCK_ENABLED :
+                    Characteristic.LockPhysicalControls.CONTROL_LOCK_DISABLED;
+
+            callback(null, state);
+        } catch (err) {
+            this.log.error('getLockPhysicalControls', err);
+            callback(err);
+        }
+    }
+
+    async setLockPhysicalControls(state, callback) {
+        try {
+            const locked = state === Characteristic.LockPhysicalControls.CONTROL_LOCK_ENABLED ? 'on' : 'off',
+                [result] = await this.device.call('set_child_lock', [locked]);
+
+            if (result !== 'ok') throw new Error(result);
+
+            callback();
+        } catch (err) {
+            this.log.error('setLockPhysicalControls', err);
             callback(err);
         }
     }
