@@ -89,6 +89,12 @@ class MiHumidifier {
             .on('get', this.getLockPhysicalControls.bind(this))
             .on('set', this.setLockPhysicalControls.bind(this));
 
+        // Dry mode
+        device
+            .addCharacteristic(Characteristic.SwingMode)
+            .on('get', this.getDryMode.bind(this))
+            .on('set', this.setDryMode.bind(this));
+
         // Temperature sensor
         if (options.temperature) {
             let temperature = new Service.TemperatureSensor(options.temperature.name || 'Temperature');
@@ -284,6 +290,34 @@ class MiHumidifier {
             callback();
         } catch (err) {
             this.log.error('setLockPhysicalControls', err);
+            callback(err);
+        }
+    }
+
+    async getDryMode(callback) {
+        try {
+            const [mode] = await this.device.call('get_prop', ['dry']),
+                state = mode === 'on' ?
+                    Characteristic.SwingMode.SWING_ENABLED :
+                    Characteristic.SwingMode.SWING_DISABLED;
+
+            callback(null, state);
+        } catch (err) {
+            this.log.error('getDryMode', err);
+            callback(err);
+        }
+    }
+
+    async setDryMode(state, callback) {
+        try {
+            const mode = state === Characteristic.SwingMode.SWING_ENABLED ? 'on' : 'off',
+                [result] = await this.device.call('set_dry', [mode]);
+
+            if (result !== 'ok') throw new Error(result);
+
+            callback();
+        } catch (err) {
+            this.log.error('setDryMode', err);
             callback(err);
         }
     }
