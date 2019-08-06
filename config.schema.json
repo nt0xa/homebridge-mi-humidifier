@@ -36,31 +36,27 @@
         ],
         "required": true
       },
-      "temperature": {
-        "title": "Temperature sensor",
-        "type": ["boolean", "object"],
-        "default": false,
-        "properties": {
-          "name": {
-            "title": "Sensor name",
-            "type": "string",
-            "minLength": 1,
-            "default": "Temperature"
-          }
-        }
+      "showTemperature": {
+        "title": "Show temperature sensor",
+        "type": "boolean",
+        "default": true
       },
-      "humidity": {
-        "title": "Humidity sensor",
-        "type": ["boolean", "object"],
-        "default": false,
-        "properties": {
-          "name": {
-            "title": "Sensor name",
-            "type": "string",
-            "minLength": 1,
-            "default": "Humidity"
-          }
-        }
+      "nameTemperature": {
+        "title": "Temperature sensor name",
+        "type": "string",
+        "default": "Temperature",
+        "minLength": 1
+      },
+      "showHumidity": {
+        "title": "Show humidity sensor",
+        "type": "boolean",
+        "default": true
+      },
+      "nameHumidity": {
+        "title": "Humidity sensor name",
+        "type": "string",
+        "default": "Humidity",
+        "minLength": 1
       }
     }
   }

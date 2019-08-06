@@ -2,8 +2,10 @@ const miio = require('miio');
 
 const defaults = {
     name: 'Humidifier',
-    temperature: false,
-    humidity: false
+    showTemperature: true,
+    nameTemperature: 'Temperature',
+    showHumidity: true,
+    nameHumidity: 'Humidity'
 };
 
 // Note: the `auto` mode can be set only in the Smartmi Evaporative Humidifier (zhimi.humidifier.ca1)
@@ -89,15 +91,15 @@ class MiHumidifier {
             .on('get', this.getLockPhysicalControls.bind(this))
             .on('set', this.setLockPhysicalControls.bind(this));
 
-        // Dry mode
+        // Drying mode
         device
             .addCharacteristic(Characteristic.SwingMode)
-            .on('get', this.getDryMode.bind(this))
-            .on('set', this.setDryMode.bind(this));
+            .on('get', this.getDryingMode.bind(this))
+            .on('set', this.setDryingMode.bind(this));
 
         // Temperature sensor
-        if (options.temperature) {
-            let temperature = new Service.TemperatureSensor(options.temperature.name || 'Temperature');
+        if (options.showTemperature) {
+            let temperature = new Service.TemperatureSensor(options.nameTemperature);
 
             temperature
                 .getCharacteristic(Characteristic.CurrentTemperature)
@@ -107,8 +109,8 @@ class MiHumidifier {
         }
 
         // Humidity sensor
-        if (options.humidity){
-            let humidity = new Service.HumiditySensor(options.humidity.name || 'Humidity');
+        if (options.showHumidity){
+            let humidity = new Service.HumiditySensor(options.nameHumidity);
 
             humidity
                 .getCharacteristic(Characteristic.CurrentRelativeHumidity)
@@ -294,7 +296,7 @@ class MiHumidifier {
         }
     }
 
-    async getDryMode(callback) {
+    async getDryingMode(callback) {
         try {
             const [mode] = await this.device.call('get_prop', ['dry']),
                 state = mode === 'on' ?
@@ -303,12 +305,12 @@ class MiHumidifier {
 
             callback(null, state);
         } catch (err) {
-            this.log.error('getDryMode', err);
+            this.log.error('getDryingMode', err);
             callback(err);
         }
     }
 
-    async setDryMode(state, callback) {
+    async setDryingMode(state, callback) {
         try {
             const mode = state === Characteristic.SwingMode.SWING_ENABLED ? 'on' : 'off',
                 [result] = await this.device.call('set_dry', [mode]);
@@ -317,7 +319,7 @@ class MiHumidifier {
 
             callback();
         } catch (err) {
-            this.log.error('setDryMode', err);
+            this.log.error('setDryingMode', err);
             callback(err);
         }
     }
