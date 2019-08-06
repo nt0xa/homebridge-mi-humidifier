@@ -8,7 +8,7 @@ const defaults = {
     nameHumidity: 'Humidity'
 };
 
-// Note: the `auto` mode can be set only in the Smartmi Evaporative Humidifier (zhimi.humidifier.ca1)
+// Note: the `auto` mode can be set only in the Smartmi Evaporative Humidifier
 const speedLevels = ['off', 'silent', 'medium', 'high', 'auto'];
 
 let Service, Characteristic;
@@ -23,11 +23,12 @@ class MiHumidifier {
     constructor(log, config) {
         if (!config.ip) throw new Error('Your must provide IP address of the Humidifier');
         if (!config.token) throw new Error('Your must provide token of the Humidifier');
-        if (!config.model) throw new Error('Your must provide model of the Humidifier (v1 or ca1)');
+        if (!config.model) throw new Error('Your must provide model of the Humidifier (v1/ca1/cb1)');
 
         let options = { ...defaults, ...config },
             info = new Service.AccessoryInformation(),
-            device = new Service.HumidifierDehumidifier(options.name);
+            device = new Service.HumidifierDehumidifier(options.name),
+            isModel2 = /ca1|cb1/.test(options.model);
 
         this.log = log;
         this.ip = config.ip;
@@ -69,8 +70,8 @@ class MiHumidifier {
             .on('set', this.setTargetRelativeHumidity.bind(this));
 
         // Current water level (remaining water level)
-        // Note: this characteristic works only for Smartmi Evaporative Humidifier (zhimi.humidifier.ca1)
-        options.model === 'ca1' && device
+        // Note: this characteristic works only for Smartmi Evaporative Humidifier
+        isModel2 && device
             .getCharacteristic(Characteristic.WaterLevel)
             .on('get', this.getWaterLevel.bind(this));
 
@@ -79,31 +80,35 @@ class MiHumidifier {
             .getCharacteristic(Characteristic.RotationSpeed)
             .setProps({
                 minValue: 0,
-                maxValue: options.model === 'ca1' ? 4 : 3,
+                maxValue: isModel2 ? 4 : 3,
                 minStep: 1
             })
             .on('get', this.getRotationSpeed.bind(this))
             .on('set', this.setRotationSpeed.bind(this));
 
         // Child lock
-        device
+        // Note: this characteristic works only for Smartmi Evaporative Humidifier
+        isModel2 && device
             .addCharacteristic(Characteristic.LockPhysicalControls)
             .on('get', this.getLockPhysicalControls.bind(this))
             .on('set', this.setLockPhysicalControls.bind(this));
 
         // Drying mode
-        device
+        // Note: this characteristic works only for Smartmi Evaporative Humidifier
+        // TODO: maybe here we need to use something else instead of SwingMode, but this is the closest Characteristic type
+        isModel2 && device
             .addCharacteristic(Characteristic.SwingMode)
             .on('get', this.getDryingMode.bind(this))
             .on('set', this.setDryingMode.bind(this));
 
         // Temperature sensor
         if (options.showTemperature) {
-            let temperature = new Service.TemperatureSensor(options.nameTemperature);
+            let temperature = new Service.TemperatureSensor(options.nameTemperature),
+                handler = options.model === 'cb1' ? this.getCurrentTemperatureCB1 : this.getCurrentTemperature;
 
             temperature
                 .getCharacteristic(Characteristic.CurrentTemperature)
-                .on('get', this.getCurrentTemperature.bind(this));
+                .on('get', handler.bind(this));
 
             this.services.push(temperature);
         }
@@ -264,6 +269,17 @@ class MiHumidifier {
             callback(null, temperature / 10);
         } catch (err) {
             this.log.error('getCurrentTemperature', err);
+            callback(err);
+        }
+    }
+
+    async getCurrentTemperatureCB1(callback) {
+        try {
+            const [temperature] = await this.device.call('get_prop', ['temperature']);
+
+            callback(null, temperature);
+        } catch (err) {
+            this.log.error('getCurrentTemperatureCB1', err);
             callback(err);
         }
     }
