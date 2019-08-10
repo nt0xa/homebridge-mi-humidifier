@@ -38,7 +38,7 @@
             "enum": ["cb1"]
           }
         ],
-        "required": true
+        "default": "v1"
       },
       "showTemperature": {
         "title": "Show temperature sensor",

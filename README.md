@@ -34,7 +34,7 @@ A Xiaomi Mi humidifier plugin for Homebridge.
 
 - `ip` – device IP address;
 - `token` – device token (32 hex chars);
-- `model` – the model of a humidifier (`v1` for Smartmi Humidifier, `ca1` or `cb1` for Smartmi Evaporative Humidifier);
+- `model` (optional) – the model of a humidifier (`v1` for Smartmi Humidifier, `ca1` or `cb1` for Smartmi Evaporative Humidifier). Default is 'v1';
 - `name` (optional) – device name. Default is 'Humidifier';
 - `showTemperature` (optional) – if `true`, the temperature sensor will be added. Default is `true`;
 - `nameTemperature` (optional) – temperature sensor name. Default is 'Temperature';
