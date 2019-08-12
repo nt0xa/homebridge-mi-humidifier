@@ -3,13 +3,13 @@ const miio = require('miio')
 const defaults = {
   model: 'v1',
   name: 'Humidifier',
-  showTemperature: true,
+  showTemperature: false,
   nameTemperature: 'Temperature',
-  showHumidity: true,
+  showHumidity: false,
   nameHumidity: 'Humidity'
 }
 
-// Note: the `auto` mode can be set only in the Smartmi Evaporative Humidifier
+// Note: the `auto` mode can be set only for the Smartmi Evaporative Humidifier
 const speedLevels = ['off', 'silent', 'medium', 'high', 'auto']
 
 let Service, Characteristic
@@ -230,7 +230,7 @@ class MiHumidifier {
 
   async getRotationSpeed(callback) {
     try {
-      const mode = await this.device.call('get_prop', ['mode']),
+      const [ mode ] = await this.device.call('get_prop', ['mode']),
         speed = speedLevels.findIndex(item => item === mode)
 
       callback(null, speed)

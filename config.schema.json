@@ -43,7 +43,7 @@
       "showTemperature": {
         "title": "Show temperature sensor",
         "type": "boolean",
-        "default": true
+        "default": false
       },
       "nameTemperature": {
         "title": "Temperature sensor name",
@@ -54,7 +54,7 @@
       "showHumidity": {
         "title": "Show humidity sensor",
         "type": "boolean",
-        "default": true
+        "default": false
       },
       "nameHumidity": {
         "title": "Humidity sensor name",
