@@ -15,7 +15,7 @@
     "url": "https://github.com/russtone/homebridge-mi-humidifier.git"
   },
   "engines": {
-    "node": ">=7.6",
+    "node": ">=8.3.0",
     "homebridge": ">=0.4.38",
     "miio": ">=0.15.6"
   }

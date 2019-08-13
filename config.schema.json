@@ -7,9 +7,8 @@
       "name": {
         "title": "Name",
         "type": "string",
-        "default": "Bedroom Humidifier",
-        "minLength": 1,
-        "required": true
+        "default": "Humidifier",
+        "minLength": 1
       },
       "ip": {
         "title": "IP",
@@ -19,53 +18,49 @@
       "token": {
         "title": "Token",
         "type": "string",
+        "pattern": "^[a-f\\d]{32}$",
         "required": true
       },
       "model": {
         "title": "Model",
         "type": "string",
-        "default": "v1",
         "oneOf": [
           {
             "title": "v1",
-            "enum": [
-              "v1"
-            ]
+            "enum": ["v1"]
           },
           {
             "title": "ca1",
-            "enum": [
-              "ca1"
-            ]
+            "enum": ["ca1"]
+          },
+          {
+            "title": "cb1",
+            "enum": ["cb1"]
           }
         ],
-        "required": true
+        "default": "v1"
       },
       "showTemperature": {
-        "title": "Show Temperature",
+        "title": "Show temperature sensor",
         "type": "boolean",
-        "default": true,
-        "required": true
+        "default": false
       },
       "nameTemperature": {
-        "title": "Name Temperature",
+        "title": "Temperature sensor name",
         "type": "string",
-        "default": "Bedroom Temperature 1",
-        "minLength": 1,
-        "required": true
+        "default": "Temperature",
+        "minLength": 1
       },
       "showHumidity": {
-        "title": "Show Humidity",
+        "title": "Show humidity sensor",
         "type": "boolean",
-        "default": true,
-        "required": true
+        "default": false
       },
       "nameHumidity": {
-        "title": "Name Humidity",
+        "title": "Humidity sensor name",
         "type": "string",
-        "default": "Bedroom Humidity",
-        "minLength": 1,
-        "required": true
+        "default": "Humidity",
+        "minLength": 1
       }
     }
   }
