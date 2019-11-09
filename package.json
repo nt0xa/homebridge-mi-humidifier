@@ -18,5 +18,8 @@
     "node": ">=8.3.0",
     "homebridge": ">=0.4.38",
     "miio": ">=0.15.6"
+  },
+  "dependencies": {
+    "miio": "^0.15.6"
   }
 }
