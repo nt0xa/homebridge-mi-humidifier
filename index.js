@@ -50,11 +50,17 @@ class MiHumidifier {
     // Current state
     device
       .getCharacteristic(Characteristic.CurrentHumidifierDehumidifierState)
+      .setProps({
+        validValues: [0,2]
+      })
       .on('get', this.getCurrentHumidifierState.bind(this))
 
     // Target state (only humidifier is supported)
     device
       .getCharacteristic(Characteristic.TargetHumidifierDehumidifierState)
+      .setProps({
+        validValues: [1]
+      })
       .setValue(Characteristic.TargetHumidifierDehumidifierState.HUMIDIFIER)
 
     // Current relative humidity
@@ -63,9 +69,8 @@ class MiHumidifier {
       .on('get', this.getCurrentRelativeHumidity.bind(this))
 
     // Target relative humidity
-    // Note: this Characteristic cannot be viewed in the Home.app, but it can be changed using Siri Voice Commands or by using some 3rd Party HomeKit apps
     device
-      .addCharacteristic(Characteristic.TargetRelativeHumidity)
+      .addCharacteristic(Characteristic.RelativeHumidityHumidifierThreshold)
       .on('get', this.getTargetRelativeHumidity.bind(this))
       .on('set', this.setTargetRelativeHumidity.bind(this))
 
