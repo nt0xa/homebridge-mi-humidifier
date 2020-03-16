@@ -70,7 +70,13 @@ class MiHumidifier {
 
     // Target relative humidity
     device
-      .addCharacteristic(Characteristic.RelativeHumidityHumidifierThreshold)
+      .getCharacteristic(Characteristic.RelativeHumidityHumidifierThreshold)
+      .setProps({
+        minValue: 30,
+        maxValue: 80,
+        minStep: 10,
+        validValues: [30, 40, 50, 60, 70, 80]
+      })
       .on('get', this.getTargetRelativeHumidity.bind(this))
       .on('set', this.setTargetRelativeHumidity.bind(this))
 
