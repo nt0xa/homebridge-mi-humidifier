@@ -1,8 +1,10 @@
 const { MODES } = require('constants');
 
 module.exports = class {
-    constructor() {
+    constructor(characteristic) {
         this.version = "v1";
+
+        this.characteristic = characteristic;
 
         this.initializePower();
         this.initializeHumidity();
@@ -14,14 +16,14 @@ module.exports = class {
     initializePower() {
         this.powerGetName = "power";
         this.convertPowerToActivity = function (power) {
-            return power === "on" ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE;
+            return power === "on" ? this.characteristic.Active.ACTIVE : this.characteristic.Active.INACTIVE;
         };
         this.convertPowerToHumidifierState = function (power) {
-            return power === "on" ? Characteristic.CurrentHumidifierDehumidifierState.HUMIDIFYING : Characteristic.CurrentHumidifierDehumidifierState.INACTIVE;
+            return power === "on" ? this.characteristic.CurrentHumidifierDehumidifierState.HUMIDIFYING : this.characteristic.CurrentHumidifierDehumidifierState.INACTIVE;
         };
         this.powerSetName = "set_power";
         this.convertActivityToPower = function (activity) {
-            return activity === Characteristic.Active.ACTIVE ? "on" : "off";
+            return activity === this.characteristic.Active.ACTIVE ? "on" : "off";
         };
     }
 

@@ -1,24 +1,24 @@
 // deerma.humidifier.mjjsq contract: https://github.com/rytilahti/python-miio/issues/533, https://github.com/rytilahti/python-miio/blob/master/miio/airhumidifier_mjjsq.py
-const MiHumidifierCBL = require('./MiHumidifierCBL');
+const MiHumidifierCB1 = require('./MiHumidifierCB1');
 
-module.exports = class extends MiHumidifierCBL {
-    constructor() {
-        super();
-        this.version = "mjjsql";
+module.exports = class extends MiHumidifierCB1 {
+    constructor(characteristic) {
+        super(characteristic);
+        this.version = "mjjsq";
     }
 
     initializePower() {
         super.initializePower();
         this.powerGetName = "OnOff_State";
         this.convertPowerToActivity = function (power) {
-            return power === 1 ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE;
+            return power === 1 ? this.characteristic.Active.ACTIVE : this.characteristic.Active.INACTIVE;
         };
         this.convertPowerToHumidifierState = function (power) {
-            return power === 1 ? Characteristic.CurrentHumidifierDehumidifierState.HUMIDIFYING : Characteristic.CurrentHumidifierDehumidifierState.INACTIVE;
+            return power === 1 ? this.characteristic.CurrentHumidifierDehumidifierState.HUMIDIFYING : this.characteristic.CurrentHumidifierDehumidifierState.INACTIVE;
         };
         this.powerSetName = "Set_OnOff";
         this.convertActivityToPower = function (activity) {
-            return activity === Characteristic.Active.ACTIVE ? 1 : 0;
+            return activity === this.characteristic.Active.ACTIVE ? 1 : 0;
         };
     }
 
@@ -66,11 +66,11 @@ module.exports = class extends MiHumidifierCBL {
         super.initializeSwitch1();
         this.switch1GetName = "Led_State";
         this.convertSwitch1ToSwingMode = function (switch1) {
-            return switch1 === 1 ? Characteristic.SwingMode.SWING_ENABLED : Characteristic.SwingMode.SWING_DISABLED;
+            return switch1 === 1 ? this.characteristic.SwingMode.SWING_ENABLED : this.characteristic.SwingMode.SWING_DISABLED;
         };
         this.switch1SetName = "SetLedState";
         this.convertSwingModeToSwitch1 = function (swingMode) {
-            return Number(swingMode === Characteristic.SwingMode.SWING_ENABLED);
+            return Number(swingMode === this.characteristic.SwingMode.SWING_ENABLED);
         };
     }
 

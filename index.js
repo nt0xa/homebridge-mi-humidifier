@@ -1,8 +1,8 @@
 // Characteristics: http://auto.caitken.com/posts/2018/09/09/nodered-homekit-characteristics-reference
 const MiHumidifierV1 = require('./devices/MiHumidifierV1');
-const MiHumidifierCAL = require('./devices/MiHumidifierCAL');
-const MiHumidifierCBL = require('./devices/MiHumidifierCBL');
-const MiHumidifierMJJSQL = require('./devices/MiHumidifierMJJSQL');
+const MiHumidifierCA1 = require('./devices/MiHumidifierCA1');
+const MiHumidifierCB1 = require('./devices/MiHumidifierCB1');
+const MiHumidifierMJJSQ = require('./devices/MiHumidifierMJJSQ');
 const miio = require('miio')
 
 const defaults = {
@@ -13,8 +13,6 @@ const defaults = {
     showHumidity: false,
     nameHumidity: 'Humidity'
 };
-
-const SUPPORTED_HUMIDIFIERS = [new MiHumidifierV1(), new MiHumidifierCAL(), new MiHumidifierCBL(), new MiHumidifierMJJSQL()];
 
 let Service, Characteristic;
 
@@ -29,6 +27,8 @@ class MiHumidifier {
         if (!config.ip) throw new Error('Your must provide IP address of the Humidifier');
         if (!config.token) throw new Error('Your must provide token of the Humidifier');
 
+        const SUPPORTED_HUMIDIFIERS = [new MiHumidifierV1(Characteristic), new MiHumidifierCA1(Characteristic), new MiHumidifierCB1(Characteristic), new MiHumidifierMJJSQ(Characteristic)];
+
         let options = { ...defaults, ...config };
         this.infoService = new Service.AccessoryInformation();
         this.humidifierService = new Service.HumidifierDehumidifier(options.name);
@@ -37,7 +37,7 @@ class MiHumidifier {
         this.ip = config.ip;
         this.token = config.token;
         this.services = [this.humidifierService, this.infoService];
-        this.humidifier = SUPPORTED_HUMIDIFIERS.find(element => element.version === config.model);
+        this.humidifier = SUPPORTED_HUMIDIFIERS.find(element => element.version === options.model);
 
         // Device info
         this.infoService
@@ -108,7 +108,7 @@ class MiHumidifier {
                 .on('set', this.setRotationSpeed.bind(this));
         }
 
-        // cal/cbl: child lock
+        // ca1/cb1: child lock
         if (this.humidifier.childLockGetName && this.humidifier.childLockSetName) {
             this.humidifierService
                 .addCharacteristic(Characteristic.LockPhysicalControls)
@@ -116,7 +116,7 @@ class MiHumidifier {
                 .on('set', this.setChildLock.bind(this));
         }
 
-        // cal/cbl: drying mode
+        // ca1/cb1: drying mode
         // mjjsql: Led status
         if (this.humidifier.switch1GetName && this.humidifier.switch1SetName) {
             this.humidifierService
