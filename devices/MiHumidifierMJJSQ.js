@@ -4,7 +4,7 @@ const MiHumidifierCB1 = require('./MiHumidifierCB1');
 module.exports = class extends MiHumidifierCB1 {
     constructor(characteristic) {
         super(characteristic);
-        this.version = "mjjsql";
+        this.version = "mjjsq";
     }
 
     initializePower() {

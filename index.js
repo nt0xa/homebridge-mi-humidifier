@@ -2,7 +2,7 @@
 const MiHumidifierV1 = require('./devices/MiHumidifierV1');
 const MiHumidifierCA1 = require('./devices/MiHumidifierCA1');
 const MiHumidifierCB1 = require('./devices/MiHumidifierCB1');
-const MiHumidifierMJJSQL = require('./devices/MiHumidifierMJJSQL');
+const MiHumidifierMJJSQ = require('./devices/MiHumidifierMJJSQ');
 const miio = require('miio')
 
 const defaults = {
@@ -27,7 +27,7 @@ class MiHumidifier {
         if (!config.ip) throw new Error('Your must provide IP address of the Humidifier');
         if (!config.token) throw new Error('Your must provide token of the Humidifier');
 
-        const SUPPORTED_HUMIDIFIERS = [new MiHumidifierV1(Characteristic), new MiHumidifierCA1(Characteristic), new MiHumidifierCB1(Characteristic), new MiHumidifierMJJSQL(Characteristic)];
+        const SUPPORTED_HUMIDIFIERS = [new MiHumidifierV1(Characteristic), new MiHumidifierCA1(Characteristic), new MiHumidifierCB1(Characteristic), new MiHumidifierMJJSQ(Characteristic)];
 
         let options = { ...defaults, ...config };
         this.infoService = new Service.AccessoryInformation();
