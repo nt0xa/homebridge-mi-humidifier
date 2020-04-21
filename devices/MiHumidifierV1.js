@@ -1,4 +1,4 @@
-const { MODES } = require('constants');
+const { MODES } = require('./constants');
 
 module.exports = class {
     constructor(characteristic) {
