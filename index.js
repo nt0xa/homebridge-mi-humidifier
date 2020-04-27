@@ -15,6 +15,10 @@ const defaults = {
     nameHumidity: 'Humidity'
 };
 
+const idleRequestTimeout = 500;
+const repeatRequestTimeout = 200;
+const repeatAttemptsCount = 5;
+
 let Service, Characteristic;
 
 module.exports = homebridge => {
@@ -113,6 +117,12 @@ class MiHumidifier {
         this.log.debug(message);
     }
 
+    sleep(ms) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
+
     registerCharacteristic(operation, service, characteristicName, doRegistration, callback, setPropsValue) {
         if (doRegistration) {
             const characteristic = service.getCharacteristic(characteristicName);
@@ -141,15 +151,52 @@ class MiHumidifier {
         return true;
     }
 
+    async getCharacteristicValueAttempt(devicePropertyName, resolve, reject, attemptNumber) {
+        this.device.call('get_prop', [devicePropertyName])
+            .then(value => resolve({ attempt: attemptNumber, value: value }))
+            .catch(error => {
+                if ((error.message === 'busy.') && (attemptNumber < repeatAttemptsCount + 1)) {
+                    this.sleep(repeatRequestTimeout)
+                        .then(() => this.getCharacteristicValueAttempt(devicePropertyName, resolve, reject, attemptNumber + 1));
+                    return;
+                }
+                reject(error);
+            });
+    }
+
+    async getCharacteristicValue(devicePropertyName) {
+        let isDone = false;
+
+        // "this.device.call" hangs after idle, so there is getCharacteristicDelayedPromise to be started with "idleRequestTimeout" delay
+        const getCharacteristicPromise = new Promise((resolve) => {
+            this.device.call('get_prop', [devicePropertyName])
+                .then(value => {
+                    isDone = true;
+                    resolve({ attempt: 1, value: value });
+                })
+                .catch(_ => { });
+        });
+        const getCharacteristicDelayedPromise = new Promise((resolve, reject) => {
+            this.sleep(idleRequestTimeout)
+                .then(() => {
+                    if (!isDone) {
+                        this.getCharacteristicValueAttempt(devicePropertyName, resolve, reject, 2);
+                    }
+                });
+        });
+        return await Promise.race([getCharacteristicPromise, getCharacteristicDelayedPromise]);
+    }
+
     async getCharacteristic(functionName, devicePropertyName, callback, convertToHomebrdigeValue, getMessage) {
         if (!this.verifyDevice(callback)) {
             return;
         }
 
         try {
-            const [deviceValue] = await this.device.call('get_prop', [devicePropertyName]);
+            const result = await this.getCharacteristicValue(devicePropertyName);
+            const [deviceValue] = result.value;
             const homebridgeValue = convertToHomebrdigeValue(deviceValue);
-            const message = getMessage(deviceValue, homebridgeValue);
+            const message = getMessage(deviceValue, homebridgeValue) + `. Attempt #${result.attempt}`;
             this.debug(message);
 
             callback(null, homebridgeValue);
@@ -181,7 +228,7 @@ class MiHumidifier {
     }
 
     async getActive(callback) {
-        this.getCharacteristic(
+        await this.getCharacteristic(
             'getActive',
             this.humidifier.powerGetName,
             callback,
@@ -190,7 +237,7 @@ class MiHumidifier {
     }
 
     async setActive(activity, callback) {
-        this.setCharacteristic(
+        await this.setCharacteristic(
             'setActive',
             this.humidifier.powerSetName,
             callback,
@@ -200,7 +247,7 @@ class MiHumidifier {
     }
 
     async getCurrentHumidifierState(callback) {
-        this.getCharacteristic(
+        await this.getCharacteristic(
             'getCurrentHumidifierState',
             this.humidifier.powerGetName,
             callback,
@@ -209,7 +256,7 @@ class MiHumidifier {
     }
 
     async getCurrentRelativeHumidity(callback) {
-        this.getCharacteristic(
+        await this.getCharacteristic(
             'getCurrentRelativeHumidity',
             this.humidifier.humidityGetName,
             callback,
@@ -218,7 +265,7 @@ class MiHumidifier {
     }
 
     async getTargetRelativeHumidity(callback) {
-        this.getCharacteristic(
+        await this.getCharacteristic(
             'getTargetRelativeHumidity',
             this.humidifier.targetHumidityGetName,
             callback,
@@ -259,7 +306,7 @@ class MiHumidifier {
     }
 
     async getWaterLevel(callback) {
-        this.getCharacteristic(
+        await this.getCharacteristic(
             'getWaterLevel',
             this.humidifier.waterLevelGetName,
             callback,
@@ -268,7 +315,7 @@ class MiHumidifier {
     }
 
     async getRotationSpeed(callback) {
-        this.getCharacteristic(
+        await this.getCharacteristic(
             'getRotationSpeed',
             this.humidifier.modeGetName,
             callback,
@@ -310,7 +357,7 @@ class MiHumidifier {
     }
 
     async getCurrentTemperature(callback) {
-        this.getCharacteristic(
+        await this.getCharacteristic(
             'getCurrentTemperature',
             this.humidifier.temperatureGetName,
             callback,
@@ -319,7 +366,7 @@ class MiHumidifier {
     }
 
     async getChildLock(callback) {
-        this.getCharacteristic(
+        await this.getCharacteristic(
             'getChildLock',
             this.humidifier.childLockGetName,
             callback,
@@ -328,7 +375,7 @@ class MiHumidifier {
     }
 
     async setChildLock(childLock, callback) {
-        this.setCharacteristic(
+        await this.setCharacteristic(
             'setChildLock',
             this.humidifier.childLockSetName,
             callback,
@@ -338,7 +385,7 @@ class MiHumidifier {
     }
 
     async getSwitch1(callback) {
-        this.getCharacteristic(
+        await this.getCharacteristic(
             'getSwitch1',
             this.humidifier.switch1GetName,
             callback,
@@ -347,7 +394,7 @@ class MiHumidifier {
     }
 
     async setSwitch1(swingMode, callback) {
-        this.setCharacteristic(
+        await this.setCharacteristic(
             'setSwitch1',
             this.humidifier.switch1SetName,
             callback,
