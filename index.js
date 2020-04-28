@@ -9,6 +9,8 @@ const miio = require('miio')
 const defaults = {
     model: 'v1',
     name: 'Humidifier',
+    showMuteSwitch: false,
+    nameMuteSwitch: 'Mute humidifier',
     showTemperature: false,
     nameTemperature: 'Temperature',
     showHumidity: false,
@@ -81,6 +83,14 @@ class MiHumidifier {
         // ca1/cb1: child lock
         this.registerCharacteristic(CharacteristicOperation.GET, this.humidifierService, Characteristic.LockPhysicalControls, this.humidifier.childLockGetName, this.getChildLock);
         this.registerCharacteristic(CharacteristicOperation.SET, this.humidifierService, Characteristic.LockPhysicalControls, this.humidifier.childLockSetName, this.setChildLock);
+
+        // cb1: buzzer
+        if (options.showMuteSwitch && this.humidifier.buzzerGetName && this.humidifier.buzzerSetName) {
+            let speakerService = new Service.Switch(this.nameMuteSwitch);
+            this.registerCharacteristic(CharacteristicOperation.GET, speakerService, Characteristic.On, this.humidifier.buzzerGetName, this.getMute);
+            this.registerCharacteristic(CharacteristicOperation.SET, speakerService, Characteristic.On, this.humidifier.buzzerSetName, this.setMute);
+            this.services.push(speakerService);
+        }
 
         // ca1/cb1: drying mode
         // mjjsql: Led status
@@ -377,6 +387,25 @@ class MiHumidifier {
             childLock,
             childLock => this.humidifier.convertChildLockToLocked(childLock),
             (locked, childLock) => `set child lock: ${locked} (child lock: ${childLock})`);
+    }
+
+    async getMute(callback) {
+        await this.getCharacteristic(
+            'getMute',
+            this.humidifier.buzzerGetName,
+            callback,
+            buzzer => this.humidifier.convertBuzzerToMute(buzzer),
+            (buzzer, mute) => `get buzzer: ${buzzer} (mute: ${mute})`);
+    }
+
+    async setMute(mute, callback) {
+        await this.setCharacteristic(
+            'setMute',
+            this.humidifier.buzzerSetName,
+            callback,
+            mute,
+            mute => this.humidifier.convertMuteToBuzzer(mute),
+            (mute, buzzer) => `set buzzer: ${buzzer} (mute: ${mute})`);
     }
 
     async getSwitch1(callback) {
