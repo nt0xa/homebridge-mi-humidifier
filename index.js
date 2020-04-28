@@ -70,17 +70,12 @@ class MiHumidifier {
         this.registerCharacteristic(CharacteristicOperation.SET, this.humidifierService, Characteristic.RelativeHumidityHumidifierThreshold, this.humidifier.targetHumiditySetName, this.setTargetRelativeHumidity);
 
         // Current water level (remaining water level)
-        this.registerCharacteristic(CharacteristicOperation.GET, this.humidifierService, Characteristic.WaterLevel, this.humidifier.waterLevelGetName, this.getWaterLevel, {
-            minValue: this.humidifier.waterLevelLimits.Min,
-            maxValue: this.humidifier.waterLevelLimits.Max
-        });
+        this.registerCharacteristic(CharacteristicOperation.GET, this.humidifierService, Characteristic.WaterLevel, this.humidifier.waterLevelGetName, this.getWaterLevel,
+            this.humidifier.waterLevelLimits ? { minValue: this.humidifier.waterLevelLimits.Min, maxValue: this.humidifier.waterLevelLimits.Max } : {});
 
         // Rotation speed
-        this.registerCharacteristic(CharacteristicOperation.GET, this.humidifierService, Characteristic.RotationSpeed, this.humidifier.modeGetName, this.getRotationSpeed, {
-            minValue: 0,
-            maxValue: this.humidifier.modeLimits.Max,
-            minStep: 1
-        });
+        this.registerCharacteristic(CharacteristicOperation.GET, this.humidifierService, Characteristic.RotationSpeed, this.humidifier.modeGetName, this.getRotationSpeed,
+            this.humidifier.modeLimits ? { minValue: 0, maxValue: this.humidifier.modeLimits.Max, minStep: 1 } : {});
         this.registerCharacteristic(CharacteristicOperation.SET, this.humidifierService, Characteristic.RotationSpeed, this.humidifier.modeSetName, this.setRotationSpeed);
 
         // ca1/cb1: child lock
