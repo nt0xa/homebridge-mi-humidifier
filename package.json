@@ -1,6 +1,6 @@
 {
   "name": "homebridge-mi-humidifier",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Xiaomi Mi Humidifier plugin for Homebridge",
   "main": "index.js",
   "author": "russtone@yandex.ru",
