@@ -11,6 +11,7 @@ module.exports = class {
         this.initializeTargetHumidity();
         this.initializeMode();
         this.initializeTemperature();
+        this.initializeChildLock();
         this.initializeMute();
     }
 
@@ -60,6 +61,17 @@ module.exports = class {
         };
     }
 
+    initializeChildLock() {
+        this.childLockGetName = "child_lock";
+        this.convertLockedToChildLock = function (locked) {
+            return locked === 'on' ? this.characteristic.LockPhysicalControls.CONTROL_LOCK_ENABLED : this.characteristic.LockPhysicalControls.CONTROL_LOCK_DISABLED;
+        };
+        this.childLockSetName = "set_child_lock";
+        this.convertChildLockToLocked = function (childLock) {
+            return childLock === this.characteristic.LockPhysicalControls.CONTROL_LOCK_ENABLED ? 'on' : 'off';
+        };
+    }
+
     initializeMute() {
         this.buzzerGetName = "buzzer";
         this.convertBuzzerToMute = function (buzzer) {
@@ -70,5 +82,5 @@ module.exports = class {
             return mute ? 'off' : 'on';
         };
     }
-    
+
 }
