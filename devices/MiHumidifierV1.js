@@ -11,6 +11,7 @@ module.exports = class {
         this.initializeTargetHumidity();
         this.initializeMode();
         this.initializeTemperature();
+        this.initializeMute();
     }
 
     initializePower() {
@@ -58,4 +59,16 @@ module.exports = class {
             return temperature / 10;
         };
     }
+
+    initializeMute() {
+        this.buzzerGetName = "buzzer";
+        this.convertBuzzerToMute = function (buzzer) {
+            return buzzer !== 'on';
+        };
+        this.buzzerSetName = "set_buzzer";
+        this.convertMuteToBuzzer = function (mute) {
+            return mute ? 'off' : 'on';
+        };
+    }
+    
 }
