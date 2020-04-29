@@ -44,6 +44,17 @@
         ],
         "default": "v1"
       },
+      "showMuteSwitch": {
+        "title": "Show mute switch",
+        "type": "boolean",
+        "default": false
+      },
+      "nameMuteSwitch": {
+        "title": "Mute Switch name",
+        "type": "string",
+        "default": "Mute humidifier",
+        "minLength": 1
+      },
       "showTemperature": {
         "title": "Show temperature sensor",
         "type": "boolean",

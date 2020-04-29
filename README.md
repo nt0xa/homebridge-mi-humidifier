@@ -36,7 +36,9 @@ A Xiaomi Mi humidifier plugin for Homebridge.
 - `token` – device token (32 hex chars);
 - `model` (optional) – the model of a humidifier (`v1` for Smartmi Humidifier, `ca1` or `cb1` for Smartmi Evaporative Humidifier). Default is 'v1';
 - `name` (optional) – device name. Default is 'Humidifier';
-- `showTemperature` (optional) – if `true`, the temperature sensor will be added. Default is `true`;
+- `showMuteSwitch` (optional) – if `true`, the mute humidifier buzzer switch will be added. Default is `false`;
+- `nameMuteSwitch` (optional) – mute humidifier buzzer switch name. Default is 'Mute humidifier';
+- `showTemperature` (optional) – if `true`, the temperature sensor will be added. Default is `false`;
 - `nameTemperature` (optional) – temperature sensor name. Default is 'Temperature';
-- `showHumidity` (optional) – if `true`, the humidity sensor will be added. Default is `true`;
+- `showHumidity` (optional) – if `true`, the humidity sensor will be added. Default is `false`;
 - `nameHumidity` (optional) – humidity sensor name. Default is 'Humidity'.

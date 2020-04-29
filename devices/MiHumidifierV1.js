@@ -12,6 +12,7 @@ module.exports = class {
         this.initializeMode();
         this.initializeTemperature();
         this.initializeChildLock();
+        this.initializeMute();
     }
 
     initializePower() {
@@ -70,4 +71,16 @@ module.exports = class {
             return childLock === this.characteristic.LockPhysicalControls.CONTROL_LOCK_ENABLED ? 'on' : 'off';
         };
     }
+
+    initializeMute() {
+        this.buzzerGetName = "buzzer";
+        this.convertBuzzerToMute = function (buzzer) {
+            return buzzer !== 'on';
+        };
+        this.buzzerSetName = "set_buzzer";
+        this.convertMuteToBuzzer = function (mute) {
+            return mute ? 'off' : 'on';
+        };
+    }
+
 }
