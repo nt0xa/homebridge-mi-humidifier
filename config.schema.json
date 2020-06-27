@@ -40,6 +40,10 @@
           {
             "title": "mjjsq",
             "enum": ["mjjsq"]
+          },
+          {
+            "title": "deerma",
+            "enum": ["deerma"]
           }
         ],
         "default": "v1"

@@ -1,4 +1,6 @@
 // Characteristics: http://auto.caitken.com/posts/2018/09/09/nodered-homekit-characteristics-reference
+
+const DeermaHumidifierMjjsq = require('./devices/DeermaHumidifierMjjsq.js');
 const MiHumidifierV1 = require('./devices/MiHumidifierV1');
 const MiHumidifierCA1 = require('./devices/MiHumidifierCA1');
 const MiHumidifierCB1 = require('./devices/MiHumidifierCB1');
@@ -34,7 +36,7 @@ class MiHumidifier {
         if (!config.ip) throw new Error('Your must provide IP address of the Humidifier');
         if (!config.token) throw new Error('Your must provide token of the Humidifier');
 
-        const SUPPORTED_HUMIDIFIERS = [new MiHumidifierV1(Characteristic), new MiHumidifierCA1(Characteristic), new MiHumidifierCB1(Characteristic), new MiHumidifierMJJSQ(Characteristic)];
+        const SUPPORTED_HUMIDIFIERS = [new MiHumidifierV1(Characteristic), new MiHumidifierCA1(Characteristic), new MiHumidifierCB1(Characteristic), new MiHumidifierMJJSQ(Characteristic), new DeermaHumidifierMjjsq(Characteristic)];
 
         let options = { ...defaults, ...config };
         this.infoService = new Service.AccessoryInformation();
