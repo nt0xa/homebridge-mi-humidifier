@@ -31,17 +31,17 @@ module.exports = class extends MiHumidifierCB1 {
         super.initializeTargetHumidity();
         this.targetHumidityGetName = "HumiSet_Value";
         this.targetHumiditySetName = "Set_HumiValue";
-        this.targetHumidityLimits.Min = 40;
-        this.targetHumidityLimits.Max = 70;
+        this.targetHumidityLimits.Min = 30;
+        this.targetHumidityLimits.Max = 80;
     }
 
     initializeWaterLevel() {
         super.initializeWaterLevel();
         this.waterLevelGetName = "waterstatus";
         this.waterLevelLimits.Min = 0;
-        this.waterLevelLimits.Max = 1;
+        this.waterLevelLimits.Max = 100;
         this.convertWaterLevel = function (level) {
-            return level;
+            return level * 100;
         };
     }
 
@@ -71,6 +71,17 @@ module.exports = class extends MiHumidifierCB1 {
         this.switch1SetName = "SetLedState";
         this.convertSwingModeToSwitch1 = function (swingMode) {
             return Number(swingMode === this.characteristic.SwingMode.SWING_ENABLED);
+        };
+    }
+
+    initializeMute() {
+        this.buzzerGetName = "TipSound_State";
+        this.convertBuzzerToMute = function (buzzer) {
+            return buzzer !== 1;
+        };
+        this.buzzerSetName = "SetTipSound_Status";
+        this.convertMuteToBuzzer = function (mute) {
+            return mute ? 0 : 1;
         };
     }
 
