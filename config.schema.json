@@ -34,6 +34,10 @@
             "enum": ["ca1"]
           },
           {
+            "title": "ca4",
+            "enum": ["ca4"]
+          },
+          {
             "title": "cb1",
             "enum": ["cb1"]
           },
