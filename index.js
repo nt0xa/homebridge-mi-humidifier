@@ -3,8 +3,9 @@ const MiHumidifierV1 = require('./devices/MiHumidifierV1');
 const MiHumidifierCA1 = require('./devices/MiHumidifierCA1');
 const MiHumidifierCB1 = require('./devices/MiHumidifierCB1');
 const MiHumidifierMJJSQ = require('./devices/MiHumidifierMJJSQ');
+const MiHumidifierFactory = require('./devices/MiHumidifierFactory');
 const { CharacteristicOperation } = require('./devices/constants');
-const miio = require('miio')
+const miio = require('miio');
 
 const defaults = {
     model: 'v1',
@@ -27,16 +28,26 @@ module.exports = homebridge => {
     Service = homebridge.hap.Service
     Characteristic = homebridge.hap.Characteristic
     homebridge.registerAccessory('homebridge-mi-humidifier', 'MiHumidifier', MiHumidifier)
-}
+};
+
 
 class MiHumidifier {
-    constructor(log, config) {
+    constructor(log, config, api) {
         if (!config.ip) throw new Error('Your must provide IP address of the Humidifier');
         if (!config.token) throw new Error('Your must provide token of the Humidifier');
 
+        let options = { ...defaults, ...config };
+
+        this.humidifier = MiHumidifierFactory.create(log, config, api);
+        if (this.humidifier){
+            this.services = [this.humidifier.getInfoService(), this.humidifier.getHumidifierService()].concat(this.humidifier.getOptionalServices());
+            this.humidifier.discover();
+            return;
+        }
+
+
         const SUPPORTED_HUMIDIFIERS = [new MiHumidifierV1(Characteristic), new MiHumidifierCA1(Characteristic), new MiHumidifierCB1(Characteristic), new MiHumidifierMJJSQ(Characteristic)];
 
-        let options = { ...defaults, ...config };
         this.infoService = new Service.AccessoryInformation();
         this.humidifierService = new Service.HumidifierDehumidifier(options.name);
 
