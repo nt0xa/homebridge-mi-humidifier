@@ -1,25 +1,39 @@
 {
   "name": "homebridge-mi-humidifier",
-  "version": "1.4.0",
+  "version": "1.1.1",
   "description": "Xiaomi Mi Humidifier plugin for Homebridge",
-  "main": "index.js",
+  "main": "dist/index.js",
   "author": "russtone@yandex.ru",
   "license": "MIT",
-  "keywords": [
-    "homebridge-plugin",
-    "xiaomi",
-    "humidifier"
-  ],
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write src",
+    "lint": "tsc --noEmit && eslint --ext ts src",
+    "watch": "tsc --watch"
+  },
+  "keywords": ["homebridge-plugin", "xiaomi", "humidifier"],
   "repository": {
     "type": "git",
     "url": "https://github.com/russtone/homebridge-mi-humidifier.git"
   },
+  "dependencies": {
+    "miio-api": "^0.3.0"
+  },
   "engines": {
     "node": ">=8.3.0",
-    "homebridge": ">=0.4.38",
-    "miio": ">=0.15.6"
+    "homebridge": ">=0.4.38"
   },
-  "dependencies": {
-    "miio": "^0.15.6"
+  "devDependencies": {
+    "@types/node": "^14.11.8",
+    "@typescript-eslint/eslint-plugin": "^4.4.0",
+    "@typescript-eslint/parser": "^4.4.0",
+    "eslint": "^7.11.0",
+    "eslint-config-prettier": "^6.12.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "hap-nodejs": "^0.8.2",
+    "homebridge": "^1.2.3",
+    "prettier": "^2.1.2",
+    "typescript": "^4.0.3"
   }
 }

@@ -1,85 +1,103 @@
 {
   "pluginAlias": "MiHumidifier",
-  "pluginType": "accessory",
+  "pluginType": "platform",
   "schema": {
-    "type": "object",
-    "properties": {
-      "name": {
-        "title": "Name",
-        "type": "string",
-        "default": "Humidifier",
-        "minLength": 1
-      },
-      "ip": {
-        "title": "IP",
-        "type": "string",
-        "required": true
-      },
-      "token": {
-        "title": "Token",
-        "type": "string",
-        "pattern": "^[a-f\\d]{32}$",
-        "required": true
-      },
-      "model": {
-        "title": "Model",
-        "type": "string",
-        "oneOf": [
-          {
-            "title": "v1",
-            "enum": ["v1"]
-          },
-          {
-            "title": "ca1",
-            "enum": ["ca1"]
-          },
-          {
-            "title": "ca4",
-            "enum": ["ca4"]
-          },
-          {
-            "title": "cb1",
-            "enum": ["cb1"]
-          },
-          {
-            "title": "mjjsq",
-            "enum": ["mjjsq"]
+    "title": "Devices",
+    "type": "array",
+    "items": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string",
+          "default": "Humidifier",
+          "minLength": 1
+        },
+        "ip": {
+          "title": "IP",
+          "type": "string",
+          "required": true
+        },
+        "token": {
+          "title": "Token",
+          "type": "string",
+          "pattern": "^[a-f0-9]{32}$",
+          "required": true
+        },
+        "model": {
+          "title": "Model",
+          "type": "string",
+          "enum": ["v1", "ca1", "cb1", "ca4", "mjjsq"],
+          "default": "v1"
+        },
+        "temperatureSensor": {
+          "title": "Temperature sensor",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "title": "Enable temperature sensor",
+              "type": "boolean",
+              "default": false
+            },
+            "name": {
+              "title": "Temperature sensor name",
+              "type": "string",
+              "default": "Temperature",
+              "minLength": 1
+            }
           }
-        ],
-        "default": "v1"
-      },
-      "showMuteSwitch": {
-        "title": "Show mute switch",
-        "type": "boolean",
-        "default": false
-      },
-      "nameMuteSwitch": {
-        "title": "Mute Switch name",
-        "type": "string",
-        "default": "Mute humidifier",
-        "minLength": 1
-      },
-      "showTemperature": {
-        "title": "Show temperature sensor",
-        "type": "boolean",
-        "default": false
-      },
-      "nameTemperature": {
-        "title": "Temperature sensor name",
-        "type": "string",
-        "default": "Temperature",
-        "minLength": 1
-      },
-      "showHumidity": {
-        "title": "Show humidity sensor",
-        "type": "boolean",
-        "default": false
-      },
-      "nameHumidity": {
-        "title": "Humidity sensor name",
-        "type": "string",
-        "default": "Humidity",
-        "minLength": 1
+        },
+        "humiditySensor": {
+          "title": "Humidity sensor",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "title": "Enable humidity sensor",
+              "type": "boolean",
+              "default": false
+            },
+            "name": {
+              "title": "Humidity sensor name",
+              "type": "string",
+              "default": "Humidity",
+              "minLength": 1
+            }
+          }
+        },
+        "ledBulb": {
+          "title": "Led bulb",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "title": "Enable led bulb",
+              "type": "boolean",
+              "default": false
+            },
+            "name": {
+              "title": "Led bulb name",
+              "type": "string",
+              "default": "Led",
+              "minLength": 1
+            }
+          }
+        },
+        "buzzerSwitch": {
+          "title": "Buzzer switch",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "title": "Enable buzzer switch",
+              "type": "boolean",
+              "default": false
+            },
+            "name": {
+              "title": "Buzzer switch name",
+              "type": "string",
+              "default": "Buzzer",
+              "minLength": 1
+            }
+          }
+        }
       }
     }
   }

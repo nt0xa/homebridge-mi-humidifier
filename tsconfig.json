@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    /* Basic options */
+    "target": "es2018",
+    "lib": ["es2018"],
+    "module": "commonjs",
+    "rootDir": "src",
+    "outDir": "dist",
+    "declaration": true,
+
+    /* Strict type-checking options */
+    "strict": true,
+    "noImplicitAny": true,
+
+    /* Module resolution options */
+    "moduleResolution": "node",
+    "baseUrl": "src",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* Source map options */
+    "sourceMap": true,
+
+    /* Experimental options */
+    "experimentalDecorators": true
+  }
+}
