@@ -65,16 +65,16 @@
           }
         },
         "ledBulb": {
-          "title": "Led bulb",
+          "title": "Led backlight bulb",
           "type": "object",
           "properties": {
             "enabled": {
-              "title": "Enable led bulb",
+              "title": "Enable led backlight bulb",
               "type": "boolean",
               "default": false
             },
             "name": {
-              "title": "Led bulb name",
+              "title": "Led backlight bulb name",
               "type": "string",
               "default": "Led",
               "minLength": 1
