@@ -5,6 +5,7 @@ import * as miio from "miio-api";
 import { PlatformAccessory, DeviceOptions } from "../platform";
 import { Humidifier, HumidifierModel } from "./factory";
 import { ValueOf } from "./utils";
+import { RegisterHelper } from "./helper";
 
 /**
  * Base class for all humidifiers, all humidifiers must inherit from this class.
@@ -52,6 +53,13 @@ export abstract class BaseHumidifier<
    */
   get deviceId(): number {
     return this.device.id;
+  }
+
+  public helper(
+    api: hb.API,
+  ): RegisterHelper<PropsType, GetArgType, SetArgType> {
+    const { Service, Characteristic } = api.hap;
+    return new RegisterHelper(Service, Characteristic);
   }
 
   /**
@@ -263,6 +271,36 @@ export abstract class BaseHumidifier<
   }
 
   /**
+   * Maps results array to key-value device props.
+   *
+   * Most models return results in the same order as get arguments,
+   * but `shuii.humidifier.jsq001` "get_props" call don't accept any arguments
+   * and just returns all props in fixed order. So we need ability
+   * to modify this behaviour in subclasses.
+   */
+  protected mapResults(
+    results: Array<GetResultType>,
+    keys: Array<keyof PropsType>,
+  ): PropsType {
+    const result = {} as PropsType;
+
+    keys.map((key, i) => {
+      result[key] = this.extractValue(results[i]);
+    });
+
+    return result;
+  }
+
+  /**
+   * Prepares get properties device call args from stored props.
+   */
+  protected prepareGetArgs(
+    props: GetEntry<PropsType, GetArgType>[],
+  ): GetArgType[] {
+    return props.map((entry) => entry.arg(entry.key as string));
+  }
+
+  /**
    * Returns all registered device properties by requesting them from the device.
    * If called multiple times simultaneously does request only once and returns
    * the same promise for all callers.
@@ -271,18 +309,17 @@ export abstract class BaseHumidifier<
     if (!this.getPropsPromise) {
       this.getPropsPromise = new Promise<PropsType>((resolve, reject) => {
         this.device
-          .call<GetArgType[], GetResultType[]>(
+          .call<unknown[], GetResultType[]>(
             this.getCallName(),
-            this.props.map((entry) => entry.arg(entry.key as string)),
+            this.prepareGetArgs(this.props),
           )
           .then((results) => {
-            const result = {} as PropsType;
-
-            this.props.map((p, i) => {
-              result[p.key] = this.extractValue(results[i]);
-            });
-
-            resolve(result);
+            resolve(
+              this.mapResults(
+                results,
+                this.props.map((entry) => entry.key),
+              ),
+            );
           })
           .catch((err) => reject(err));
       }).finally(() => {

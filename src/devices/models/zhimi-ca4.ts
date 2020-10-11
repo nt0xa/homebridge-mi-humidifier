@@ -30,10 +30,7 @@ type Props = {
 };
 
 export class ZhimiHumidifierCA4 extends MiotHumidifier<Props> {
-  protected callArgs(
-    key: keyof Props,
-    value: ValueOf<Props> | null,
-  ): MiotArg<ValueOf<Props>> {
+  protected callArgs(key: keyof Props, value: ValueOf<Props> | null): MiotArg {
     const common = { did: key, value };
 
     switch (key) {
