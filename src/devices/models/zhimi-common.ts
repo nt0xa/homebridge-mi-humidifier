@@ -1,4 +1,8 @@
 import type * as hb from "homebridge";
+import * as miio from "miio-api";
+
+import { Protocol } from "../protocol";
+import { MiioProtocol } from "../miio";
 import { MiioHumidifier } from "../miio";
 import { PlatformAccessory, DeviceOptions } from "../../platform";
 
@@ -20,6 +24,10 @@ export type CommonProps = {
 export abstract class ZhimiCommon<
   PropsType extends CommonProps
 > extends MiioHumidifier<PropsType> {
+  protected getProtocol(device: miio.Device): Protocol<PropsType> {
+    return new MiioProtocol(device);
+  }
+
   configureAccessory(
     accessory: PlatformAccessory,
     api: hb.API,
@@ -54,6 +62,13 @@ export abstract class ZhimiCommon<
         ],
       },
       value: Characteristic.TargetHumidifierDehumidifierState.HUMIDIFIER,
+    });
+
+    const helper = this.helper(api);
+
+    helper.active("power", {
+      isActive: (it) => it === "on",
+      toProp: (isActive) => (isActive ? "on" : "off"),
     });
 
     this.register(accessory, {

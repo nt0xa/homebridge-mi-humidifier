@@ -38,7 +38,7 @@ type GetResultType = MiotResult;
 type SetArgType = MiotArg;
 type SetResultType = MiotResult;
 
-export abstract class MiioProtocol<
+export abstract class MiotProtocol<
   PropsType extends BasePropsType
 > extends BaseProtocol<
   PropsType,

@@ -5,7 +5,7 @@ import { ValueOf } from "./utils";
 /**
  * High level API for the device.
  */
-interface Protocol<PropsType> {
+export interface Protocol<PropsType> {
   setProp<PropKey extends keyof PropsType>(
     prop: PropKey,
     call: string,

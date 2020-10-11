@@ -1,4 +1,8 @@
 import type * as hb from "homebridge";
+import * as miio from "miio-api";
+
+import { Protocol } from "../protocol";
+import { MiotProtocol } from "../miot";
 import { PlatformAccessory, DeviceOptions } from "../../platform";
 import { MiotHumidifier, MiotArg } from "../miot";
 import { ValueOf } from "../utils";
@@ -29,7 +33,48 @@ type Props = {
   temperature: number;
 };
 
+class Proto extends MiotProtocol<Props> {
+  protected getCallArg(key: keyof Props): MiotArg {
+    return this.callArgs(key, null);
+  }
+
+  protected setCallArg(key: keyof Props, value: ValueOf<Props>): MiotArg {
+    return this.callArgs(key, value);
+  }
+
+  private callArgs(key: keyof Props, value: ValueOf<Props> | null): MiotArg {
+    const common = { did: key, value };
+
+    switch (key) {
+      case "power":
+        return { ...common, siid: 2, piid: 1 };
+      case "mode":
+        return { ...common, siid: 2, piid: 5 };
+      case "target_humidity":
+        return { ...common, siid: 2, piid: 6 };
+      case "water_level":
+        return { ...common, siid: 2, piid: 7 };
+      case "dry":
+        return { ...common, siid: 2, piid: 8 };
+      case "humidity":
+        return { ...common, siid: 3, piid: 9 };
+      case "child_lock":
+        return { ...common, siid: 6, piid: 1 };
+      case "led_brightness":
+        return { ...common, siid: 5, piid: 1 };
+      case "buzzer":
+        return { ...common, siid: 4, piid: 1 };
+      case "temperature":
+        return { ...common, siid: 3, piid: 7 };
+    }
+  }
+}
+
 export class ZhimiHumidifierCA4 extends MiotHumidifier<Props> {
+  protected getProtocol(device: miio.Device): Protocol<Props> {
+    return new Proto(device);
+  }
+
   protected callArgs(key: keyof Props, value: ValueOf<Props> | null): MiotArg {
     const common = { did: key, value };
 

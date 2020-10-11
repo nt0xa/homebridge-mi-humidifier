@@ -4,6 +4,7 @@ import * as miio from "miio-api";
 
 import { PlatformAccessory, DeviceOptions } from "../platform";
 import { Humidifier, HumidifierModel } from "./factory";
+import { Protocol } from "./protocol";
 import { ValueOf } from "./utils";
 import { RegisterHelper } from "./helper";
 
@@ -25,6 +26,7 @@ export abstract class BaseHumidifier<
   protected readonly device: miio.Device;
   protected readonly model: HumidifierModel;
   protected readonly log: hb.Logging;
+  protected readonly protocol: Protocol<PropsType>;
 
   private props: Array<GetEntry<PropsType, GetArgType>>;
   private cache: PropsType;
@@ -38,6 +40,7 @@ export abstract class BaseHumidifier<
     this.device = device;
     this.model = model;
     this.log = log;
+    this.protocol = this.getProtocol(device);
 
     this.props = [];
     this.cache = {} as PropsType;
@@ -61,6 +64,8 @@ export abstract class BaseHumidifier<
     const { Service, Characteristic } = api.hap;
     return new RegisterHelper(Service, Characteristic);
   }
+
+  protected abstract getProtocol(device: miio.Device): Protocol<PropsType>;
 
   /**
    * Must return call name for getting properties from device.

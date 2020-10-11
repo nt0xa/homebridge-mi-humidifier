@@ -1,4 +1,8 @@
 import type * as hb from "homebridge";
+import * as miio from "miio-api";
+
+import { Protocol } from "../protocol";
+import { MiioProtocol } from "../miio";
 import { MiioHumidifier } from "../miio";
 import { PlatformAccessory, DeviceOptions } from "../../platform";
 
@@ -27,6 +31,10 @@ type Props = {
 };
 
 export class DeermaHumidifierMJJSQ extends MiioHumidifier<Props> {
+  protected getProtocol(device: miio.Device): Protocol<Props> {
+    return new MiioProtocol(device);
+  }
+
   configureAccessory(
     accessory: PlatformAccessory,
     api: hb.API,
