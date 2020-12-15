@@ -3,7 +3,7 @@ import type * as hap from "hap-nodejs";
 import { BasePropsType, BaseHumidifier } from "./humidifier";
 import { PlatformAccessory } from "../platform";
 
-export class HumidifierHelper<PropsType extends BasePropsType> {
+export class FeaturesHelper<PropsType extends BasePropsType> {
   humidifier: BaseHumidifier<PropsType>;
   accessory: PlatformAccessory;
   Service: typeof hap.Service;

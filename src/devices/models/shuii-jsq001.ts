@@ -73,12 +73,12 @@ export class ShuiiHumidifierJSQ001 extends BaseHumidifier<Props> {
     options: DeviceOptions,
   ): void {
     super.configureAccessory(accessory, api, options);
-    const register = this.helper(accessory, api);
+    const features = this.features(accessory, api);
 
-    register.currentState();
-    register.targetState();
-    register.active("power", "set_start", { on: State.On, off: State.Off });
-    register.rotationSpeed("mode", "set_mode", {
+    features.currentState();
+    features.targetState();
+    features.active("power", "set_start", { on: State.On, off: State.Off });
+    features.rotationSpeed("mode", "set_mode", {
       modes: [
         Mode.Off,
         Mode.Level1,
@@ -89,15 +89,15 @@ export class ShuiiHumidifierJSQ001 extends BaseHumidifier<Props> {
         Mode.Intelligent,
       ],
     });
-    register.humidity("humidity");
-    register.waterLevel("no_water", { toChar: (it) => it * 100 });
-    register.lockPhysicalControls("child_lock", "set_lock", {
+    features.humidity("humidity");
+    features.waterLevel("no_water", { toChar: (it) => it * 100 });
+    features.lockPhysicalControls("child_lock", "set_lock", {
       on: State.On,
       off: State.Off,
     });
 
     if (options.ledBulb?.enabled) {
-      register.ledBulb("led_brightness", "set_brightness", {
+      features.ledBulb("led_brightness", "set_brightness", {
         name: options.ledBulb.name,
         modes: [LedState.Off, LedState.Dim, LedState.Bright],
         on: LedState.Dim,
@@ -106,7 +106,7 @@ export class ShuiiHumidifierJSQ001 extends BaseHumidifier<Props> {
     }
 
     if (options.buzzerSwitch?.enabled) {
-      register.buzzerSwitch("buzzer", "set_buzzer", {
+      features.buzzerSwitch("buzzer", "set_buzzer", {
         name: options.buzzerSwitch.name,
         on: State.On,
         off: State.Off,
@@ -114,13 +114,13 @@ export class ShuiiHumidifierJSQ001 extends BaseHumidifier<Props> {
     }
 
     if (options.humiditySensor?.enabled) {
-      register.humiditySensor("humidity", {
+      features.humiditySensor("humidity", {
         name: options.humiditySensor.name,
       });
     }
 
     if (options.temperatureSensor?.enabled) {
-      register.temperatureSensor("temperature", {
+      features.temperatureSensor("temperature", {
         name: options.temperatureSensor.name,
         toChar: (it) => it,
       });

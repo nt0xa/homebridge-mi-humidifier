@@ -6,6 +6,7 @@ import {
   ZhimiHumidifierCAB1,
   ZhimiHumidifierCA4,
   DeermaHumidifierMJJSQ,
+  ShuiiHumidifierJSQ001,
 } from "./models";
 
 /**
@@ -63,6 +64,9 @@ export class HumidifierFactory {
       case HumidifierModel.DEERMA_MJJSQ:
         return new DeermaHumidifierMJJSQ(device, model, log);
 
+      case HumidifierModel.SHUII_JSQ001:
+        return new ShuiiHumidifierJSQ001(device, model, log);
+
       default:
         throw new HumidifierError(`Unsupported humidifier model "${model}"`);
     }
@@ -75,6 +79,7 @@ export enum HumidifierModel {
   ZHIMI_CB1 = "zhimi.humidifier.cb1",
   ZHIMI_CA4 = "zhimi.humidifier.ca4",
   DEERMA_MJJSQ = "deerma.humidifier.mjjsq",
+  SHUII_JSQ001 = "shuii.humidifier.jsq001",
 }
 
 export interface Humidifier {

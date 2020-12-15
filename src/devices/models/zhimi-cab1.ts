@@ -26,18 +26,18 @@ export class ZhimiHumidifierCAB1 extends ZhimiCommon<Props> {
     options: DeviceOptions,
   ): void {
     super.configureAccessory(accessory, api, options);
-    const register = this.helper(accessory, api);
+    const features = this.features(accessory, api);
 
-    register.rotationSpeed("mode", "set_mode", {
+    features.rotationSpeed("mode", "set_mode", {
       modes: [Mode.Off, Mode.Silent, Mode.Medium, Mode.High, Mode.Auto],
     });
-    register.waterLevel("depth", {
+    features.waterLevel("depth", {
       toChar: (it) => it / 1.2,
     });
-    register.swingMode("dry", "set_dry", { on: "on", off: "off" });
+    features.swingMode("dry", "set_dry", { on: "on", off: "off" });
 
     if (options.temperatureSensor?.enabled) {
-      register.temperatureSensor(
+      features.temperatureSensor(
         this.deviceModel === HumidifierModel.ZHIMI_CA1
           ? "temp_dec"
           : "temperature",

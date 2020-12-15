@@ -81,27 +81,27 @@ export class ZhimiHumidifierCA4 extends BaseHumidifier<Props> {
     options: DeviceOptions,
   ): void {
     super.configureAccessory(accessory, api, options);
-    const register = this.helper(accessory, api);
+    const features = this.features(accessory, api);
 
-    register.currentState();
-    register.targetState();
-    register.active("power", "set_properties", { on: true, off: false });
-    register.rotationSpeed("mode", "set_properties", {
+    features.currentState();
+    features.targetState();
+    features.active("power", "set_properties", { on: true, off: false });
+    features.rotationSpeed("mode", "set_properties", {
       modes: [Mode.Off, Mode.Low, Mode.Medium, Mode.High, Mode.Auto],
     });
-    register.humidityThreshold("target_humidity", "set_properties");
-    register.waterLevel("water_level", {
+    features.humidityThreshold("target_humidity", "set_properties");
+    features.waterLevel("water_level", {
       toChar: (it) => it / 1.2,
     });
-    register.swingMode("dry", "set_properties", { on: true, off: false });
-    register.humidity("humidity");
-    register.lockPhysicalControls("child_lock", "set_properties", {
+    features.swingMode("dry", "set_properties", { on: true, off: false });
+    features.humidity("humidity");
+    features.lockPhysicalControls("child_lock", "set_properties", {
       on: true,
       off: false,
     });
 
     if (options.ledBulb?.enabled) {
-      register.ledBulb("led_brightness", "set_properties", {
+      features.ledBulb("led_brightness", "set_properties", {
         name: options.ledBulb.name,
         modes: [LedState.Off, LedState.Dim, LedState.Bright],
         on: LedState.Dim,
@@ -110,7 +110,7 @@ export class ZhimiHumidifierCA4 extends BaseHumidifier<Props> {
     }
 
     if (options.buzzerSwitch?.enabled) {
-      register.buzzerSwitch("buzzer", "set_properties", {
+      features.buzzerSwitch("buzzer", "set_properties", {
         name: options.buzzerSwitch.name,
         on: true,
         off: false,
@@ -118,13 +118,13 @@ export class ZhimiHumidifierCA4 extends BaseHumidifier<Props> {
     }
 
     if (options.humiditySensor?.enabled) {
-      register.humiditySensor("humidity", {
+      features.humiditySensor("humidity", {
         name: options.humiditySensor.name,
       });
     }
 
     if (options.temperatureSensor?.enabled) {
-      register.temperatureSensor("temperature", {
+      features.temperatureSensor("temperature", {
         name: options.temperatureSensor.name,
         toChar: (it) => it,
       });

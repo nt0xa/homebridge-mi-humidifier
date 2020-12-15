@@ -5,7 +5,7 @@ import * as miio from "miio-api";
 import { PlatformAccessory, DeviceOptions } from "../platform";
 import { Humidifier, HumidifierModel } from "./factory";
 import { Protocol } from "./protocols/protocol";
-import { HumidifierHelper } from "./helper";
+import { FeaturesHelper } from "./helper";
 import { ValueOf } from "./utils";
 
 /**
@@ -71,17 +71,13 @@ export abstract class BaseHumidifier<PropsType extends BasePropsType>
   }
 
   /**
-   * Returns helper object for easier services
-   * registering.
+   * Returns helper for easier services register.
    *
    * @param accessory homebridge accessory
    * @param api homebridge API
    */
-  protected helper(
-    accessory: PlatformAccessory,
-    api: hb.API,
-  ): HumidifierHelper<PropsType> {
-    return new HumidifierHelper(
+  protected features(accessory: PlatformAccessory, api: hb.API) {
+    return new FeaturesHelper(
       this,
       accessory,
       api.hap.Service,

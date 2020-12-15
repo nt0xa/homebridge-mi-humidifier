@@ -21,14 +21,14 @@ export class ZhimiHumidifierV1 extends ZhimiCommon<Props> {
     options: DeviceOptions,
   ): void {
     super.configureAccessory(accessory, api, options);
-    const register = this.helper(accessory, api);
+    const features = this.features(accessory, api);
 
-    register.rotationSpeed("mode", "set_mode", {
+    features.rotationSpeed("mode", "set_mode", {
       modes: [Mode.Off, Mode.Silent, Mode.Medium, Mode.High],
     });
 
     if (options.temperatureSensor?.enabled) {
-      register.temperatureSensor("temp_dec", {
+      features.temperatureSensor("temp_dec", {
         name: options.temperatureSensor.name,
         toChar: (it) => it / 10,
       });

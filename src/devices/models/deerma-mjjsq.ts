@@ -41,19 +41,19 @@ export class DeermaHumidifierMJJSQ extends BaseHumidifier<Props> {
     options: DeviceOptions,
   ): void {
     super.configureAccessory(accessory, api, options);
-    const register = this.helper(accessory, api);
+    const features = this.features(accessory, api);
 
-    register.currentState();
-    register.targetState();
-    register.active("OnOff_State", "Set_OnOff", {
+    features.currentState();
+    features.targetState();
+    features.active("OnOff_State", "Set_OnOff", {
       on: State.On,
       off: State.Off,
     });
-    register.rotationSpeed("Humidifier_Gear", "Set_HumidifierGears", {
+    features.rotationSpeed("Humidifier_Gear", "Set_HumidifierGears", {
       modes: [Gear.Off, Gear.Low, Gear.Medium, Gear.High, Gear.Humidity],
     });
-    register.humidity("Humidity_Value");
-    register.humidityThreshold("HumiSet_Value", "Set_HumiValue", {
+    features.humidity("Humidity_Value");
+    features.humidityThreshold("HumiSet_Value", "Set_HumiValue", {
       beforeSet: async (_value, _characteristic, callback) => {
         // There is special mode for humidity threshold - Gear.Humidity,
         // so set mode to Gear.Humidity.
@@ -71,10 +71,10 @@ export class DeermaHumidifierMJJSQ extends BaseHumidifier<Props> {
         return false;
       },
     });
-    register.waterLevel("waterstatus", { toChar: (it) => it * 100 });
+    features.waterLevel("waterstatus", { toChar: (it) => it * 100 });
 
     if (options.ledBulb?.enabled) {
-      register.ledBulb("Led_State", "SetLedState", {
+      features.ledBulb("Led_State", "SetLedState", {
         name: options.ledBulb.name,
         modes: [State.Off, State.On],
         on: State.On,
@@ -83,7 +83,7 @@ export class DeermaHumidifierMJJSQ extends BaseHumidifier<Props> {
     }
 
     if (options.buzzerSwitch?.enabled) {
-      register.buzzerSwitch("TipSound_State", "SetTipSound_Status", {
+      features.buzzerSwitch("TipSound_State", "SetTipSound_Status", {
         name: options.buzzerSwitch.name,
         on: State.On,
         off: State.Off,
@@ -91,13 +91,13 @@ export class DeermaHumidifierMJJSQ extends BaseHumidifier<Props> {
     }
 
     if (options.humiditySensor?.enabled) {
-      register.humiditySensor("Humidity_Value", {
+      features.humiditySensor("Humidity_Value", {
         name: options.humiditySensor.name,
       });
     }
 
     if (options.temperatureSensor?.enabled) {
-      register.temperatureSensor("TemperatureValue", {
+      features.temperatureSensor("TemperatureValue", {
         name: options.temperatureSensor.name,
         toChar: (it) => it,
       });

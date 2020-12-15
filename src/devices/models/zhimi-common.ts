@@ -33,20 +33,20 @@ export abstract class ZhimiCommon<
     options: DeviceOptions,
   ): void {
     super.configureAccessory(accessory, api, options);
-    const register = this.helper(accessory, api);
+    const features = this.features(accessory, api);
 
-    register.currentState();
-    register.targetState();
-    register.active("power", "set_power", { on: "on", off: "off" });
-    register.humidityThreshold("limit_hum", "set_limit_hum");
-    register.lockPhysicalControls("child_lock", "set_child_lock", {
+    features.currentState();
+    features.targetState();
+    features.active("power", "set_power", { on: "on", off: "off" });
+    features.humidityThreshold("limit_hum", "set_limit_hum");
+    features.lockPhysicalControls("child_lock", "set_child_lock", {
       on: "on",
       off: "off",
     });
-    register.humidity("humidity");
+    features.humidity("humidity");
 
     if (options.ledBulb?.enabled) {
-      register.ledBulb("led_b", "set_led_b", {
+      features.ledBulb("led_b", "set_led_b", {
         name: options.ledBulb.name,
         modes: [LedState.Off, LedState.Dim, LedState.Bright],
         on: LedState.Dim,
@@ -55,7 +55,7 @@ export abstract class ZhimiCommon<
     }
 
     if (options.buzzerSwitch?.enabled) {
-      register.buzzerSwitch("buzzer", "set_buzzer", {
+      features.buzzerSwitch("buzzer", "set_buzzer", {
         name: options.buzzerSwitch.name,
         on: "on",
         off: "off",
@@ -63,7 +63,7 @@ export abstract class ZhimiCommon<
     }
 
     if (options.humiditySensor?.enabled) {
-      register.humiditySensor("humidity", {
+      features.humiditySensor("humidity", {
         name: options.humiditySensor.name,
       });
     }
