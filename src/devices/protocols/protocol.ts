@@ -1,6 +1,6 @@
 import * as miio from "miio-api";
-import { BasePropsType } from "./humidifier";
-import { ValueOf } from "./utils";
+import { BasePropsType } from "../humidifier";
+import { ValueOf } from "../utils";
 
 /**
  * High level API for the device.

@@ -1,12 +1,12 @@
 import type * as hb from "homebridge";
 import * as miio from "miio-api";
 
-import { Protocol } from "../protocol";
-import { MiioProtocol } from "../miio";
-import { MiioHumidifier } from "../miio";
+import { BaseHumidifier } from "../humidifier";
+import { Protocol, MiioProtocol } from "../protocols";
 import { PlatformAccessory, DeviceOptions } from "../../platform";
 
 enum Gear {
+  Off = -1,
   Low = 1,
   Medium = 2,
   High = 3,
@@ -30,7 +30,7 @@ type Props = {
   watertankstatus: State;
 };
 
-export class DeermaHumidifierMJJSQ extends MiioHumidifier<Props> {
+export class DeermaHumidifierMJJSQ extends BaseHumidifier<Props> {
   protected getProtocol(device: miio.Device): Protocol<Props> {
     return new MiioProtocol(device);
   }
@@ -41,209 +41,65 @@ export class DeermaHumidifierMJJSQ extends MiioHumidifier<Props> {
     options: DeviceOptions,
   ): void {
     super.configureAccessory(accessory, api, options);
+    const register = this.helper(accessory, api);
 
-    const { Service, Characteristic } = api.hap;
-
-    //
-    // Humidifier
-    //
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.CurrentHumidifierDehumidifierState,
-      props: {
-        validValues: [
-          Characteristic.CurrentHumidifierDehumidifierState.INACTIVE,
-          Characteristic.CurrentHumidifierDehumidifierState.HUMIDIFYING,
-        ],
-      },
-      value: Characteristic.CurrentHumidifierDehumidifierState.HUMIDIFYING,
+    register.currentState();
+    register.targetState();
+    register.active("OnOff_State", "Set_OnOff", {
+      on: State.On,
+      off: State.Off,
     });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.TargetHumidifierDehumidifierState,
-      props: {
-        validValues: [
-          Characteristic.TargetHumidifierDehumidifierState.HUMIDIFIER,
-        ],
-      },
-      value: Characteristic.TargetHumidifierDehumidifierState.HUMIDIFIER,
+    register.rotationSpeed("Humidifier_Gear", "Set_HumidifierGears", {
+      modes: [Gear.Off, Gear.Low, Gear.Medium, Gear.High, Gear.Humidity],
     });
+    register.humidity("Humidity_Value");
+    register.humidityThreshold("HumiSet_Value", "Set_HumiValue", {
+      beforeSet: async (_value, _characteristic, callback) => {
+        // There is special mode for humidity threshold - Gear.Humidity,
+        // so set mode to Gear.Humidity.
+        try {
+          await this.protocol.setProp(
+            "HumiSet_Value",
+            "Set_HumiValue",
+            Gear.Humidity,
+          );
+        } catch (err) {
+          callback(err);
+          return true;
+        }
 
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.Active,
-      key: "OnOff_State",
-      set: {
-        call: "Set_OnOff",
+        return false;
       },
     });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.Active,
-      props: {
-        minValue: 0,
-        maxValue: 4,
-      },
-      key: "Humidifier_Gear",
-      get: {
-        map: (it) => {
-          switch (it) {
-            case Gear.Low:
-              return 1;
-            case Gear.Medium:
-              return 2;
-            case Gear.High:
-              return 3;
-            case Gear.Humidity:
-              return 4;
-            default:
-              return 0;
-          }
-        },
-      },
-      set: {
-        call: "Set_HumidifierGears",
-        map: (it) => {
-          switch (it) {
-            case 1:
-              return Gear.Low;
-            case 2:
-              return Gear.Medium;
-            case 3:
-              return Gear.High;
-            case 4:
-              return Gear.Humidity;
-            default:
-              return Gear.Low;
-          }
-        },
-      },
-    });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.CurrentRelativeHumidity,
-      key: "Humidity_Value",
-    });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.RelativeHumidityHumidifierThreshold,
-      props: {
-        minValue: 30,
-        maxValue: 80,
-      },
-      key: "HumiSet_Value",
-      set: {
-        call: "Set_HumiValue",
-        beforeSet: async (_value, _characteristic, callback) => {
-          // There is special mode for humidity threshold - Gear.Humidity,
-          // so set mode to Gear.Humidity.
-          try {
-            const [result] = await this.device.call("Set_HumiValue", [
-              Gear.Humidity,
-            ]);
-
-            if (result !== "ok") {
-              throw new Error(`Fail to set "Set_HumiValue"`);
-            }
-          } catch (err) {
-            callback(err);
-            return true;
-          }
-
-          return false;
-        },
-      },
-    });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.WaterLevel,
-      key: "waterstatus",
-      get: {
-        map: (it) => it * 100,
-      },
-    });
-
-    //
-    // Temperature sensor
-    //
-
-    if (options.temperatureSensor?.enabled) {
-      if (options.temperatureSensor.name) {
-        this.register(accessory, {
-          service: Service.TemperatureSensor,
-          characteristic: Characteristic.Name,
-          value: options.temperatureSensor.name,
-        });
-      }
-
-      this.register(accessory, {
-        service: Service.TemperatureSensor,
-        characteristic: Characteristic.CurrentTemperature,
-        key: "TemperatureValue",
-      });
-    }
-
-    //
-    // Led bulb
-    //
+    register.waterLevel("waterstatus", { toChar: (it) => it * 100 });
 
     if (options.ledBulb?.enabled) {
-      if (options.ledBulb.name) {
-        this.register(accessory, {
-          service: Service.Lightbulb,
-          characteristic: Characteristic.Name,
-          value: options.ledBulb.name,
-        });
-      }
-
-      this.register(accessory, {
-        service: Service.Lightbulb,
-        characteristic: Characteristic.On,
-        key: "Led_State",
-        get: {
-          map: (it) => it === State.On,
-        },
-        set: {
-          call: "SetLedState",
-          map: (it) => (it ? State.On : State.Off),
-        },
+      register.ledBulb("Led_State", "SetLedState", {
+        name: options.ledBulb.name,
+        modes: [State.Off, State.On],
+        on: State.On,
+        off: State.Off,
       });
     }
 
-    //
-    // Buzzer switch
-    //
-
     if (options.buzzerSwitch?.enabled) {
-      if (options.buzzerSwitch.name) {
-        this.register(accessory, {
-          service: Service.Switch,
-          characteristic: Characteristic.Name,
-          value: options.buzzerSwitch.name,
-        });
-      }
+      register.buzzerSwitch("TipSound_State", "SetTipSound_Status", {
+        name: options.buzzerSwitch.name,
+        on: State.On,
+        off: State.Off,
+      });
+    }
 
-      this.register(accessory, {
-        service: Service.Switch,
-        characteristic: Characteristic.Active,
-        key: "TipSound_State",
-        get: {
-          map: (it) =>
-            it === State.On
-              ? Characteristic.Active.ACTIVE
-              : Characteristic.Active.INACTIVE,
-        },
-        set: {
-          call: "SetTipSound_Status",
-          map: (it) =>
-            it === Characteristic.Active.ACTIVE ? State.On : State.Off,
-        },
+    if (options.humiditySensor?.enabled) {
+      register.humiditySensor("Humidity_Value", {
+        name: options.humiditySensor.name,
+      });
+    }
+
+    if (options.temperatureSensor?.enabled) {
+      register.temperatureSensor("TemperatureValue", {
+        name: options.temperatureSensor.name,
+        toChar: (it) => it,
       });
     }
   }

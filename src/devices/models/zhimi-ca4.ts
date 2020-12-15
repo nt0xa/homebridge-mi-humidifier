@@ -1,13 +1,13 @@
 import type * as hb from "homebridge";
 import * as miio from "miio-api";
 
-import { Protocol } from "../protocol";
-import { MiotProtocol } from "../miot";
+import { BaseHumidifier } from "../humidifier";
+import { Protocol, MiotProtocol, MiotArg } from "../protocols";
 import { PlatformAccessory, DeviceOptions } from "../../platform";
-import { MiotHumidifier, MiotArg } from "../miot";
 import { ValueOf } from "../utils";
 
 enum Mode {
+  Off = -1, // dummy
   Auto = 0,
   Low = 1,
   Medium = 2,
@@ -70,36 +70,9 @@ class Proto extends MiotProtocol<Props> {
   }
 }
 
-export class ZhimiHumidifierCA4 extends MiotHumidifier<Props> {
+export class ZhimiHumidifierCA4 extends BaseHumidifier<Props> {
   protected getProtocol(device: miio.Device): Protocol<Props> {
     return new Proto(device);
-  }
-
-  protected callArgs(key: keyof Props, value: ValueOf<Props> | null): MiotArg {
-    const common = { did: key, value };
-
-    switch (key) {
-      case "power":
-        return { ...common, siid: 2, piid: 1 };
-      case "mode":
-        return { ...common, siid: 2, piid: 5 };
-      case "target_humidity":
-        return { ...common, siid: 2, piid: 6 };
-      case "water_level":
-        return { ...common, siid: 2, piid: 7 };
-      case "dry":
-        return { ...common, siid: 2, piid: 8 };
-      case "humidity":
-        return { ...common, siid: 3, piid: 9 };
-      case "child_lock":
-        return { ...common, siid: 6, piid: 1 };
-      case "led_brightness":
-        return { ...common, siid: 5, piid: 1 };
-      case "buzzer":
-        return { ...common, siid: 4, piid: 1 };
-      case "temperature":
-        return { ...common, siid: 3, piid: 7 };
-    }
   }
 
   public configureAccessory(
@@ -108,298 +81,52 @@ export class ZhimiHumidifierCA4 extends MiotHumidifier<Props> {
     options: DeviceOptions,
   ): void {
     super.configureAccessory(accessory, api, options);
+    const register = this.helper(accessory, api);
 
-    const { Service, Characteristic } = api.hap;
-
-    //
-    // Humidifier
-    //
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.CurrentHumidifierDehumidifierState,
-      props: {
-        validValues: [
-          Characteristic.CurrentHumidifierDehumidifierState.INACTIVE,
-          Characteristic.CurrentHumidifierDehumidifierState.HUMIDIFYING,
-        ],
-      },
-      value: Characteristic.CurrentHumidifierDehumidifierState.HUMIDIFYING,
+    register.currentState();
+    register.targetState();
+    register.active("power", "set_properties", { on: true, off: false });
+    register.rotationSpeed("mode", "set_properties", {
+      modes: [Mode.Off, Mode.Low, Mode.Medium, Mode.High, Mode.Auto],
     });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.TargetHumidifierDehumidifierState,
-      props: {
-        validValues: [
-          Characteristic.TargetHumidifierDehumidifierState.HUMIDIFIER,
-        ],
-      },
-      value: Characteristic.TargetHumidifierDehumidifierState.HUMIDIFIER,
+    register.humidityThreshold("target_humidity", "set_properties");
+    register.waterLevel("water_level", {
+      toChar: (it) => it / 1.2,
     });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.Active,
-      key: "power",
-      get: {
-        arg: (key) => this.callArgs(key, null),
-        map: (it) =>
-          it ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE,
-      },
-      set: {
-        call: "set_properties",
-        arg: this.callArgs,
-        map: (it) => it === Characteristic.Active.ACTIVE,
-      },
+    register.swingMode("dry", "set_properties", { on: true, off: false });
+    register.humidity("humidity");
+    register.lockPhysicalControls("child_lock", "set_properties", {
+      on: true,
+      off: false,
     });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.RotationSpeed,
-      props: {
-        minValue: 0,
-        maxValue: 3,
-      },
-      key: "mode",
-      get: {
-        arg: (key) => this.callArgs(key, null),
-        map: (it) => {
-          switch (it) {
-            case Mode.Low:
-              return 1;
-            case Mode.Medium:
-              return 2;
-            case Mode.High:
-              return 3;
-            case Mode.Auto:
-              return 4;
-          }
-        },
-      },
-      set: {
-        call: "set_properties",
-        arg: this.callArgs,
-        map: (it) => {
-          switch (it) {
-            case 1:
-              return Mode.Low;
-            case 2:
-              return Mode.Medium;
-            case 3:
-              return Mode.High;
-            case 4:
-              return Mode.Auto;
-            default:
-              return Mode.Low;
-          }
-        },
-      },
-    });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.RelativeHumidityHumidifierThreshold,
-      props: {
-        minValue: 30,
-        maxValue: 80,
-      },
-      key: "target_humidity",
-      get: {
-        arg: (key) => this.callArgs(key, null),
-      },
-      set: {
-        call: "set_properties",
-        arg: this.callArgs,
-      },
-    });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.WaterLevel,
-      key: "water_level",
-      get: {
-        arg: (key) => this.callArgs(key, null),
-        map: (it) => it / 1.2,
-      },
-      set: {
-        call: "set_properties",
-        arg: this.callArgs,
-      },
-    });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.SwingMode,
-      key: "dry",
-      get: {
-        arg: (key) => this.callArgs(key, null),
-        map: (it) =>
-          it
-            ? Characteristic.SwingMode.SWING_ENABLED
-            : Characteristic.SwingMode.SWING_DISABLED,
-      },
-      set: {
-        call: "set_properties",
-        arg: this.callArgs,
-        map: (it) => it === Characteristic.SwingMode.SWING_ENABLED,
-      },
-    });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.CurrentRelativeHumidity,
-      key: "humidity",
-      get: {
-        arg: (key) => this.callArgs(key, null),
-      },
-    });
-
-    this.register(accessory, {
-      service: Service.HumidifierDehumidifier,
-      characteristic: Characteristic.LockPhysicalControls,
-      key: "child_lock",
-      get: {
-        arg: (key) => this.callArgs(key, null),
-        map: (it) =>
-          it
-            ? Characteristic.LockPhysicalControls.CONTROL_LOCK_ENABLED
-            : Characteristic.LockPhysicalControls.CONTROL_LOCK_DISABLED,
-      },
-      set: {
-        call: "set_properties",
-        arg: this.callArgs,
-        map: (it) =>
-          it === Characteristic.LockPhysicalControls.CONTROL_LOCK_ENABLED,
-      },
-    });
-
-    //
-    // Led bulb
-    //
 
     if (options.ledBulb?.enabled) {
-      if (options.ledBulb.name) {
-        this.register(accessory, {
-          service: Service.Lightbulb,
-          characteristic: Characteristic.Name,
-          value: options.ledBulb.name,
-        });
-      }
-
-      this.register(accessory, {
-        service: Service.Lightbulb,
-        characteristic: Characteristic.Brightness,
-        props: {
-          minValue: 0,
-          maxValue: 2,
-        },
-        key: "led_brightness",
-        get: {
-          arg: (key) => this.callArgs(key, null),
-          map: (it) => {
-            switch (it) {
-              case LedState.Off:
-                return 0;
-              case LedState.Dim:
-                return 1;
-              case LedState.Bright:
-                return 2;
-              default:
-                return 0;
-            }
-          },
-        },
-        set: {
-          call: "set_properties",
-          arg: this.callArgs,
-          map: (it) => {
-            switch (it) {
-              case 0:
-                return LedState.Off;
-              case 1:
-                return LedState.Dim;
-              case 2:
-                return LedState.Bright;
-              default:
-                return LedState.Off;
-            }
-          },
-        },
-      });
-
-      this.register(accessory, {
-        service: Service.Lightbulb,
-        characteristic: Characteristic.On,
-        key: "led_brightness",
-        get: {
-          arg: (key) => this.callArgs(key, null),
-          map: (it) => (it !== LedState.Off ? true : false),
-        },
-        set: {
-          call: "set_properties",
-          arg: this.callArgs,
-          map: (it) => (it ? LedState.Dim : LedState.Off),
-          beforeSet: (value, characteristic) => {
-            // HomeKit trying to set "On" to true after changing brightness
-            // which cause switching brightness back to Dim.
-            // So skip set if bulb has already turned on.
-            return value === characteristic.value;
-          },
-        },
+      register.ledBulb("led_brightness", "set_properties", {
+        name: options.ledBulb.name,
+        modes: [LedState.Off, LedState.Dim, LedState.Bright],
+        on: LedState.Dim,
+        off: LedState.Off,
       });
     }
-
-    //
-    // Buzzer switch
-    //
 
     if (options.buzzerSwitch?.enabled) {
-      if (options.buzzerSwitch.name) {
-        this.register(accessory, {
-          service: Service.Switch,
-          characteristic: Characteristic.Name,
-          value: options.buzzerSwitch.name,
-        });
-      }
-
-      this.register(accessory, {
-        service: Service.Switch,
-        characteristic: Characteristic.Active,
-        key: "buzzer",
-        get: {
-          arg: (key) => this.callArgs(key, null),
-          map: (it) =>
-            it ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE,
-        },
-        set: {
-          call: "set_properties",
-          arg: this.callArgs,
-          map: (it) => it === Characteristic.Active.ACTIVE,
-        },
+      register.buzzerSwitch("buzzer", "set_properties", {
+        name: options.buzzerSwitch.name,
+        on: true,
+        off: false,
       });
     }
 
-    //
-    // Temperature sensor
-    //
+    if (options.humiditySensor?.enabled) {
+      register.humiditySensor("humidity", {
+        name: options.humiditySensor.name,
+      });
+    }
 
     if (options.temperatureSensor?.enabled) {
-      if (options.temperatureSensor.name) {
-        this.register(accessory, {
-          service: Service.TemperatureSensor,
-          characteristic: Characteristic.Name,
-          value: options.temperatureSensor.name,
-        });
-      }
-
-      this.register(accessory, {
-        service: Service.TemperatureSensor,
-        characteristic: Characteristic.CurrentTemperature,
-        key: "temperature",
-        get: {
-          arg: (key) => this.callArgs(key, null),
-        },
+      register.temperatureSensor("temperature", {
+        name: options.temperatureSensor.name,
+        toChar: (it) => it,
       });
     }
   }
