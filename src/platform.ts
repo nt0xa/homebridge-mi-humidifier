@@ -1,5 +1,5 @@
 import * as hb from "homebridge";
-import { Humidifier, HumidifierModel, HumidifierFactory } from "./devices";
+import { Humidifier, HumidifierModel, createHumidifier } from "./devices";
 import { validateConfig } from "./utils";
 
 export const PluginName = "homebridge-mi-humidifier";
@@ -53,10 +53,12 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
       let humidifier: Humidifier;
 
       try {
-        humidifier = await HumidifierFactory.create(
+        humidifier = await createHumidifier(
           address,
           token,
           model,
+          options,
+          this.api,
           this.log,
         );
       } catch (err) {
@@ -88,12 +90,12 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
       }
 
       // Configure accessory services and characteristics.
-      humidifier.configureAccessory(accessory, this.api, options);
+      humidifier.configureAccessory(accessory);
 
       // Store humidifier context to use later in polling function.
       this.devices.set(address, humidifier);
 
-      setInterval(this.update(address), config.updateInterval);
+      setInterval(this.update(address), config.updateInterval || 30000);
     });
 
     // Unregister unused accessories.

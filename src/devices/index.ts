@@ -1,1 +1,2 @@
-export { HumidifierFactory, Humidifier, HumidifierModel } from "./factory";
+export { createHumidifier, Humidifier } from "./factory";
+export { HumidifierModel } from "./models";

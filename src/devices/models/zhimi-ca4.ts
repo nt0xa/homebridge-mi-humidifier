@@ -1,10 +1,10 @@
-import type * as hb from "homebridge";
+import type * as hap from "hap-nodejs";
 import * as miio from "miio-api";
-
-import { BaseHumidifier } from "../humidifier";
-import { Protocol, MiotProtocol, MiotArg } from "../protocols";
-import { PlatformAccessory, DeviceOptions } from "../../platform";
+import { MiotProtocol, MiotArg } from "../protocols";
+import { DeviceOptions } from "../../platform";
 import { ValueOf } from "../utils";
+import { features } from "../features";
+import { HumidifierConfig } from ".";
 
 enum Mode {
   Off = -1, // dummy
@@ -70,64 +70,63 @@ class Proto extends MiotProtocol<Props> {
   }
 }
 
-export class ZhimiHumidifierCA4 extends BaseHumidifier<Props> {
-  protected getProtocol(device: miio.Device): Protocol<Props> {
-    return new Proto(device);
-  }
+export function zhimiCA4(
+  device: miio.Device,
+  Service: typeof hap.Service,
+  Characteristic: typeof hap.Characteristic,
+  options: DeviceOptions,
+): HumidifierConfig<Props> {
+  const feat = features<Props>(Service, Characteristic);
 
-  public configureAccessory(
-    accessory: PlatformAccessory,
-    api: hb.API,
-    options: DeviceOptions,
-  ): void {
-    super.configureAccessory(accessory, api, options);
-    const features = this.features(accessory, api);
-
-    features.currentState();
-    features.targetState();
-    features.active("power", "set_properties", { on: true, off: false });
-    features.rotationSpeed("mode", "set_properties", {
-      modes: [Mode.Off, Mode.Low, Mode.Medium, Mode.High, Mode.Auto],
-    });
-    features.humidityThreshold("target_humidity", "set_properties");
-    features.waterLevel("water_level", {
-      toChar: (it) => it / 1.2,
-    });
-    features.swingMode("dry", "set_properties", { on: true, off: false });
-    features.humidity("humidity");
-    features.lockPhysicalControls("child_lock", "set_properties", {
-      on: true,
-      off: false,
-    });
-
-    if (options.ledBulb?.enabled) {
-      features.ledBulb("led_brightness", "set_properties", {
-        name: options.ledBulb.name,
-        modes: [LedState.Off, LedState.Dim, LedState.Bright],
-        on: LedState.Dim,
-        off: LedState.Off,
-      });
-    }
-
-    if (options.buzzerSwitch?.enabled) {
-      features.buzzerSwitch("buzzer", "set_properties", {
-        name: options.buzzerSwitch.name,
+  return {
+    protocol: new Proto(device),
+    features: [
+      feat.currentState(),
+      feat.targetState(),
+      feat.active("power", "set_properties", { on: true, off: false }),
+      feat.rotationSpeed("mode", "set_properties", {
+        modes: [Mode.Off, Mode.Low, Mode.Medium, Mode.High, Mode.Auto],
+      }),
+      feat.humidityThreshold("target_humidity", "set_properties"),
+      feat.waterLevel("water_level", {
+        toChar: (it) => it / 1.2,
+      }),
+      feat.swingMode("dry", "set_properties", { on: true, off: false }),
+      feat.humidity("humidity"),
+      feat.lockPhysicalControls("child_lock", "set_properties", {
         on: true,
         off: false,
-      });
-    }
+      }),
 
-    if (options.humiditySensor?.enabled) {
-      features.humiditySensor("humidity", {
-        name: options.humiditySensor.name,
-      });
-    }
+      ...(options.ledBulb?.enabled
+        ? feat.ledBulb("led_brightness", "set_properties", {
+            name: options.ledBulb.name,
+            modes: [LedState.Off, LedState.Dim, LedState.Bright],
+            on: LedState.Dim,
+            off: LedState.Off,
+          })
+        : []),
 
-    if (options.temperatureSensor?.enabled) {
-      features.temperatureSensor("temperature", {
-        name: options.temperatureSensor.name,
-        toChar: (it) => it,
-      });
-    }
-  }
+      ...(options.buzzerSwitch?.enabled
+        ? feat.buzzerSwitch("buzzer", "set_properties", {
+            name: options.buzzerSwitch.name,
+            on: true,
+            off: false,
+          })
+        : []),
+
+      ...(options.humiditySensor?.enabled
+        ? feat.humiditySensor("humidity", {
+            name: options.humiditySensor.name,
+          })
+        : []),
+
+      ...(options.temperatureSensor?.enabled
+        ? feat.temperatureSensor("temperature", {
+            name: options.temperatureSensor.name,
+            toChar: (it) => it,
+          })
+        : []),
+    ],
+  };
 }

@@ -1,7 +1,11 @@
-import type * as hb from "homebridge";
-import { PlatformAccessory, DeviceOptions } from "../../platform";
-import { HumidifierModel } from "../factory";
-import { CommonProps, ZhimiCommon } from "./zhimi-common";
+import type * as hap from "hap-nodejs";
+import * as miio from "miio-api";
+
+import { DeviceOptions } from "../../platform";
+import { MiioProtocol } from "../protocols";
+import { features, AnyCharacteristicConfig } from "../features";
+import { CommonProps, zhimiCommon } from "./zhimi-common";
+import { HumidifierConfig } from ".";
 
 enum Mode {
   Off = -1, // dummy
@@ -19,30 +23,68 @@ type Props = CommonProps & {
   temp_dec: number; // ca1
 };
 
-export class ZhimiHumidifierCAB1 extends ZhimiCommon<Props> {
-  public configureAccessory(
-    accessory: PlatformAccessory,
-    api: hb.API,
-    options: DeviceOptions,
-  ): void {
-    super.configureAccessory(accessory, api, options);
-    const features = this.features(accessory, api);
+function common<PropsType extends Props>(
+  Service: typeof hap.Service,
+  Characteristic: typeof hap.Characteristic,
+  options: DeviceOptions,
+): Array<AnyCharacteristicConfig<PropsType>> {
+  const feat = features<PropsType>(Service, Characteristic);
 
-    features.rotationSpeed("mode", "set_mode", {
+  return [
+    ...zhimiCommon<PropsType>(feat, options),
+
+    feat.rotationSpeed("mode", "set_mode", {
       modes: [Mode.Off, Mode.Silent, Mode.Medium, Mode.High, Mode.Auto],
-    });
-    features.waterLevel("depth", {
+    }),
+    feat.waterLevel("depth", {
       toChar: (it) => it / 1.2,
-    });
-    features.swingMode("dry", "set_dry", { on: "on", off: "off" });
+    }),
+    feat.swingMode("dry", "set_dry", { on: "on", off: "off" }),
+  ];
+}
 
-    if (options.temperatureSensor?.enabled) {
-      features.temperatureSensor(
-        this.deviceModel === HumidifierModel.ZHIMI_CA1
-          ? "temp_dec"
-          : "temperature",
-        { name: options.temperatureSensor.name, toChar: (it) => it / 10 },
-      );
-    }
-  }
+export function zhimiCA1(
+  device: miio.Device,
+  Service: typeof hap.Service,
+  Characteristic: typeof hap.Characteristic,
+  options: DeviceOptions,
+): HumidifierConfig<Props> {
+  const feat = features<Props>(Service, Characteristic);
+
+  return {
+    protocol: new MiioProtocol<Props>(device),
+    features: [
+      ...common<Props>(Service, Characteristic, options),
+
+      ...(options.temperatureSensor?.enabled
+        ? feat.temperatureSensor("temp_dec", {
+            name: options.temperatureSensor.name,
+            toChar: (it) => it / 10,
+          })
+        : []),
+    ],
+  };
+}
+
+export function zhimiCB1(
+  device: miio.Device,
+  Service: typeof hap.Service,
+  Characteristic: typeof hap.Characteristic,
+  options: DeviceOptions,
+): HumidifierConfig<Props> {
+  const feat = features<Props>(Service, Characteristic);
+
+  return {
+    protocol: new MiioProtocol<Props>(device),
+    features: [
+      ...common<Props>(Service, Characteristic, options),
+
+      ...(options.temperatureSensor?.enabled
+        ? feat.temperatureSensor("temperature", {
+            name: options.temperatureSensor.name,
+            toChar: (it) => it / 10,
+          })
+        : []),
+    ],
+  };
 }

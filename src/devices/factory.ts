@@ -2,12 +2,12 @@ import type * as hb from "homebridge";
 import miio, { Device } from "miio-api";
 import { DeviceOptions, PlatformAccessory } from "../platform";
 import {
-  ZhimiHumidifierV1,
-  ZhimiHumidifierCAB1,
-  ZhimiHumidifierCA4,
-  DeermaHumidifierMJJSQ,
-  ShuiiHumidifierJSQ001,
+  HumidifierModel,
+  HumidifierConfigFunc,
+  HumidifierFactory,
+  ExtractPropsType,
 } from "./models";
+import { BaseHumidifier } from "./humidifier";
 
 /**
  * Partial miIO.info call result.
@@ -41,57 +41,36 @@ const getInfo = async (device: Device): Promise<DeviceInfo> => {
   }
 };
 
-export class HumidifierFactory {
-  static async create(
-    address: string,
-    token: string,
-    model: HumidifierModel,
-    log: hb.Logging,
-  ): Promise<Humidifier> {
-    const device = await discover(address, token);
+export async function createHumidifier(
+  address: string,
+  token: string,
+  model: HumidifierModel,
+  options: DeviceOptions,
+  api: hb.API,
+  log: hb.Logging,
+): Promise<Humidifier> {
+  const device = await discover(address, token);
 
-    switch (model) {
-      case HumidifierModel.ZHIMI_V1:
-        return new ZhimiHumidifierV1(device, model, log);
+  let configFunc: HumidifierConfigFunc<any>;
 
-      case HumidifierModel.ZHIMI_CA1:
-      case HumidifierModel.ZHIMI_CB1:
-        return new ZhimiHumidifierCAB1(device, model, log);
-
-      case HumidifierModel.ZHIMI_CA4:
-        return new ZhimiHumidifierCA4(device, model, log);
-
-      case HumidifierModel.DEERMA_MJJSQ:
-        return new DeermaHumidifierMJJSQ(device, model, log);
-
-      case HumidifierModel.SHUII_JSQ001:
-        return new ShuiiHumidifierJSQ001(device, model, log);
-
-      default:
-        throw new HumidifierError(`Unsupported humidifier model "${model}"`);
-    }
+  if (model in HumidifierFactory) {
+    configFunc = HumidifierFactory[model];
+  } else {
+    throw new HumidifierError(`Unsupported humidifier model "${model}"`);
   }
-}
 
-export enum HumidifierModel {
-  ZHIMI_V1 = "zhimi.humidifier.v1",
-  ZHIMI_CA1 = "zhimi.humidifier.ca1",
-  ZHIMI_CB1 = "zhimi.humidifier.cb1",
-  ZHIMI_CA4 = "zhimi.humidifier.ca4",
-  DEERMA_MJJSQ = "deerma.humidifier.mjjsq",
-  SHUII_JSQ001 = "shuii.humidifier.jsq001",
+  const { protocol, features } = configFunc(
+    device,
+    api.hap.Service,
+    api.hap.Characteristic,
+    options,
+  );
+
+  return new BaseHumidifier(protocol, features, log);
 }
 
 export interface Humidifier {
-  readonly deviceId: number;
-  readonly deviceModel: HumidifierModel;
-
-  configureAccessory(
-    accessory: PlatformAccessory,
-    api: hb.API,
-    options: DeviceOptions,
-  ): void;
-
+  configureAccessory(accessory: PlatformAccessory): void;
   update(): Promise<void>;
 }
 

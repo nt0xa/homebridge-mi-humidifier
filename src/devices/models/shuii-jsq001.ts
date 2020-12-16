@@ -1,10 +1,10 @@
-import type * as hb from "homebridge";
+import type * as hap from "hap-nodejs";
 import * as miio from "miio-api";
-
-import { BaseHumidifier } from "../humidifier";
-import { Protocol, MiioProtocol } from "../protocols";
-import { PlatformAccessory, DeviceOptions } from "../../platform";
+import { MiioProtocol } from "../protocols";
+import { DeviceOptions } from "../../platform";
 import { ValueOf } from "../utils";
+import { features } from "../features";
+import { HumidifierConfig } from ".";
 
 enum Mode {
   Off = -1,
@@ -62,68 +62,67 @@ class Proto extends MiioProtocol<Props> {
   }
 }
 
-export class ShuiiHumidifierJSQ001 extends BaseHumidifier<Props> {
-  protected getProtocol(device: miio.Device): Protocol<Props> {
-    return new Proto(device);
-  }
+export function shuiiJSQ001(
+  device: miio.Device,
+  Service: typeof hap.Service,
+  Characteristic: typeof hap.Characteristic,
+  options: DeviceOptions,
+): HumidifierConfig<Props> {
+  const feat = features<Props>(Service, Characteristic);
 
-  configureAccessory(
-    accessory: PlatformAccessory,
-    api: hb.API,
-    options: DeviceOptions,
-  ): void {
-    super.configureAccessory(accessory, api, options);
-    const features = this.features(accessory, api);
-
-    features.currentState();
-    features.targetState();
-    features.active("power", "set_start", { on: State.On, off: State.Off });
-    features.rotationSpeed("mode", "set_mode", {
-      modes: [
-        Mode.Off,
-        Mode.Level1,
-        Mode.Level2,
-        Mode.Level3,
-        Mode.Level4,
-        Mode.Level5,
-        Mode.Intelligent,
-      ],
-    });
-    features.humidity("humidity");
-    features.waterLevel("no_water", { toChar: (it) => it * 100 });
-    features.lockPhysicalControls("child_lock", "set_lock", {
-      on: State.On,
-      off: State.Off,
-    });
-
-    if (options.ledBulb?.enabled) {
-      features.ledBulb("led_brightness", "set_brightness", {
-        name: options.ledBulb.name,
-        modes: [LedState.Off, LedState.Dim, LedState.Bright],
-        on: LedState.Dim,
-        off: LedState.Off,
-      });
-    }
-
-    if (options.buzzerSwitch?.enabled) {
-      features.buzzerSwitch("buzzer", "set_buzzer", {
-        name: options.buzzerSwitch.name,
+  return {
+    protocol: new Proto(device),
+    features: [
+      feat.currentState(),
+      feat.targetState(),
+      feat.active("power", "set_start", { on: State.On, off: State.Off }),
+      feat.rotationSpeed("mode", "set_mode", {
+        modes: [
+          Mode.Off,
+          Mode.Level1,
+          Mode.Level2,
+          Mode.Level3,
+          Mode.Level4,
+          Mode.Level5,
+          Mode.Intelligent,
+        ],
+      }),
+      feat.humidity("humidity"),
+      feat.waterLevel("no_water", { toChar: (it) => it * 100 }),
+      feat.lockPhysicalControls("child_lock", "set_lock", {
         on: State.On,
         off: State.Off,
-      });
-    }
+      }),
 
-    if (options.humiditySensor?.enabled) {
-      features.humiditySensor("humidity", {
-        name: options.humiditySensor.name,
-      });
-    }
+      ...(options.ledBulb?.enabled
+        ? feat.ledBulb("led_brightness", "set_brightness", {
+            name: options.ledBulb.name,
+            modes: [LedState.Off, LedState.Dim, LedState.Bright],
+            on: LedState.Dim,
+            off: LedState.Off,
+          })
+        : []),
 
-    if (options.temperatureSensor?.enabled) {
-      features.temperatureSensor("temperature", {
-        name: options.temperatureSensor.name,
-        toChar: (it) => it,
-      });
-    }
-  }
+      ...(options.buzzerSwitch?.enabled
+        ? feat.buzzerSwitch("buzzer", "set_buzzer", {
+            name: options.buzzerSwitch.name,
+            on: State.On,
+            off: State.Off,
+          })
+        : []),
+
+      ...(options.humiditySensor?.enabled
+        ? feat.humiditySensor("humidity", {
+            name: options.humiditySensor.name,
+          })
+        : []),
+
+      ...(options.temperatureSensor?.enabled
+        ? feat.temperatureSensor("temperature", {
+            name: options.temperatureSensor.name,
+            toChar: (it) => it,
+          })
+        : []),
+    ],
+  };
 }

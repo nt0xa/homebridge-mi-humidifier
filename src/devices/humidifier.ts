@@ -1,11 +1,10 @@
 import type * as hb from "homebridge";
 import type * as hap from "hap-nodejs";
-import * as miio from "miio-api";
 
-import { PlatformAccessory, DeviceOptions } from "../platform";
-import { Humidifier, HumidifierModel } from "./factory";
+import { PlatformAccessory } from "../platform";
+import { Humidifier } from "./factory";
+import { AnyCharacteristicConfig } from "./features";
 import { Protocol } from "./protocols/protocol";
-import { FeaturesHelper } from "./helper";
 import { ValueOf } from "./utils";
 
 /**
@@ -15,13 +14,11 @@ import { ValueOf } from "./utils";
  *   properties types. For better defaults it is recommended to use
  *   device properties names as keys is possible.
  */
-export abstract class BaseHumidifier<PropsType extends BasePropsType>
+export class BaseHumidifier<PropsType extends BasePropsType>
   implements Humidifier {
-  public deviceModel: HumidifierModel;
-  public deviceId: number;
-
-  protected readonly log: hb.Logging;
-  protected readonly protocol: Protocol<PropsType>;
+  private readonly protocol: Protocol<PropsType>;
+  private readonly features: Array<AnyCharacteristicConfig<PropsType>>;
+  private readonly log: hb.Logging;
 
   private props: GetEntry<PropsType>[];
   private cache: PropsType;
@@ -30,11 +27,14 @@ export abstract class BaseHumidifier<PropsType extends BasePropsType>
    * @param device miio.Device returned by miio.discover function.
    * @param log homebridge logger.
    */
-  constructor(device: miio.Device, model: HumidifierModel, log: hb.Logging) {
-    this.deviceModel = model;
-    this.deviceId = device.id;
+  constructor(
+    protocol: Protocol<PropsType>,
+    featues: Array<AnyCharacteristicConfig<PropsType>>,
+    log: hb.Logging,
+  ) {
+    this.protocol = protocol;
+    this.features = featues;
     this.log = log;
-    this.protocol = this.getProtocol(device);
 
     this.props = [];
     this.cache = {} as PropsType;
@@ -46,43 +46,11 @@ export abstract class BaseHumidifier<PropsType extends BasePropsType>
    * all nesessary services and characteristics.
    *
    * @param accessory homebridge accessory
-   * @param api homebridge API
-   * @param options additional options
    */
-  public configureAccessory(
-    accessory: PlatformAccessory,
-    api: hb.API,
-    _options: DeviceOptions,
-  ): void {
-    const { Service, Characteristic } = api.hap;
-
-    // Add common characteristics for all devices.
-    this.register(accessory, {
-      service: Service.AccessoryInformation,
-      characteristic: Characteristic.Manufacturer,
-      value: "Xiaomi",
+  configureAccessory(accessory: PlatformAccessory): void {
+    this.features.forEach((feature) => {
+      this.register(accessory, feature);
     });
-
-    this.register(accessory, {
-      service: Service.AccessoryInformation,
-      characteristic: Characteristic.Model,
-      value: this.deviceModel,
-    });
-  }
-
-  /**
-   * Returns helper for easier services register.
-   *
-   * @param accessory homebridge accessory
-   * @param api homebridge API
-   */
-  protected features(accessory: PlatformAccessory, api: hb.API) {
-    return new FeaturesHelper(
-      this,
-      accessory,
-      api.hap.Service,
-      api.hap.Characteristic,
-    );
   }
 
   /**
@@ -98,6 +66,12 @@ export abstract class BaseHumidifier<PropsType extends BasePropsType>
         this.props.map((prop) => prop.key),
       );
       this.props.forEach((prop) => {
+        this.log.debug(
+          "Updating prop",
+          prop.key,
+          this.cache[prop.key],
+          prop.map(this.cache[prop.key]),
+        );
         prop.characteristic.updateValue(prop.map(this.cache[prop.key]));
       });
     } catch (err) {
@@ -151,7 +125,7 @@ export abstract class BaseHumidifier<PropsType extends BasePropsType>
           map: config.set.map
             ? (config.set.map as SetMapFunc<PropsType>)
             : (it: hb.CharacteristicValue) => it as ValueOf<PropsType>, // by default use the same value.
-          beforeSet: config.set.beforeSet as BeforeSetFunc,
+          beforeSet: config.set.beforeSet as BeforeSetFunc<PropsType>,
         };
 
         characteristic.on(
@@ -166,12 +140,6 @@ export abstract class BaseHumidifier<PropsType extends BasePropsType>
       }
     }
   }
-
-  /**
-   * Returns protocol object for the device.
-   * Must be implemented in subclasses.
-   */
-  protected abstract getProtocol(device: miio.Device): Protocol<PropsType>;
 
   /**
    * Function which is used as homebridge `CharacteristicGetCallback` for
@@ -214,6 +182,7 @@ export abstract class BaseHumidifier<PropsType extends BasePropsType>
           value as PrimitiveType,
           entry.characteristic,
           callback,
+          this.protocol,
         );
 
         if (skip) {
@@ -256,10 +225,11 @@ type SetMapFunc<PropsType> = (it: hb.CharacteristicValue) => ValueOf<PropsType>;
 /**
  * Function that is called before settings the device property.
  */
-type BeforeSetFunc = (
+type BeforeSetFunc<PropsType> = (
   value: PrimitiveType,
   characteristic: hb.Characteristic,
   callback: hb.CharacteristicSetCallback,
+  protocol: Protocol<PropsType>,
 ) => Promise<boolean>;
 
 /**
@@ -299,7 +269,7 @@ export type SetEntry<PropsType> = {
   // Function that is called before settings the device property.
   // Can be used to add some extra logic.
   // If returns `true` set will be skipped.
-  beforeSet?: BeforeSetFunc;
+  beforeSet?: BeforeSetFunc<PropsType>;
 };
 
 /**
@@ -359,10 +329,11 @@ export type CharacteristicConfigDynamic<PropKey, PropValue> = {
     // Function that is called before settings the device property.
     // Can be used to add some extra logic.
     // If returns `true` set will be skipped.
-    beforeSet?: (
+    beforeSet?: <PropsType>(
       value: PropValue,
       characteristic: hb.Characteristic,
       callback: hb.CharacteristicSetCallback,
+      protocol: Protocol<PropsType>,
     ) => boolean | Promise<boolean>;
   };
 };
