@@ -5,7 +5,6 @@ import {
   HumidifierModel,
   HumidifierConfigFunc,
   HumidifierFactory,
-  ExtractPropsType,
 } from "./models";
 import { BaseHumidifier } from "./humidifier";
 

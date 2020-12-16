@@ -27,6 +27,7 @@ export enum HumidifierModel {
   ZHIMI_CB1 = "zhimi.humidifier.cb1",
   ZHIMI_CA4 = "zhimi.humidifier.ca4",
   DEERMA_MJJSQ = "deerma.humidifier.mjjsq",
+  DEERMA_JSQ = "deerma.humidifier.jsq1",
   SHUII_JSQ001 = "shuii.humidifier.jsq001",
 }
 
@@ -36,9 +37,6 @@ export const HumidifierFactory = {
   [HumidifierModel.ZHIMI_CB1]: zhimiCB1,
   [HumidifierModel.ZHIMI_CA4]: zhimiCA4,
   [HumidifierModel.DEERMA_MJJSQ]: deermaMJJSQ,
+  [HumidifierModel.DEERMA_JSQ]: deermaMJJSQ,
   [HumidifierModel.SHUII_JSQ001]: shuiiJSQ001,
 };
-
-export type ExtractPropsType<T> = T extends HumidifierConfigFunc<infer X>
-  ? X
-  : never;
