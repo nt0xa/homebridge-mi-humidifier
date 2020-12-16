@@ -61,7 +61,7 @@ class Proto extends MiotProtocol<Props> {
       case "child_lock":
         return { ...common, siid: 6, piid: 1 };
       case "led_brightness":
-        return { ...common, siid: 5, piid: 1 };
+        return { ...common, siid: 5, piid: 2 };
       case "buzzer":
         return { ...common, siid: 4, piid: 1 };
       case "temperature":
