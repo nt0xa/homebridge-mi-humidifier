@@ -13,8 +13,8 @@
           "default": "Humidifier",
           "minLength": 1
         },
-        "ip": {
-          "title": "IP",
+        "address": {
+          "title": "IP address",
           "type": "string",
           "required": true
         },
@@ -27,8 +27,20 @@
         "model": {
           "title": "Model",
           "type": "string",
-          "enum": ["v1", "ca1", "cb1", "ca4", "mjjsq"],
-          "default": "v1"
+          "enum": [
+            "zhimi.humidifier.v1",
+            "zhimi.humidifier.ca1",
+            "zhimi.humidifier.cb1",
+            "zhimi.humidifier.ca4",
+            "deerma.humidifier.mjjsq",
+            "shuii.humidifier.jsq001"
+          ],
+          "default": "zhimi.humidifier.v1"
+        },
+        "updateInterval": {
+          "title": "Parameters update interaval",
+          "type": "number",
+          "default": 30
         },
         "temperatureSensor": {
           "title": "Temperature sensor",

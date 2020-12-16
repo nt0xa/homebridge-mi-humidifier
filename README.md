@@ -21,44 +21,45 @@ A Xiaomi Mi humidifier plugin for Homebridge.
       "devices": [
         {
           "name": "Humidifier",
-          "address": "192.168.86.31",
-          "token": "93db466137accd4c9c6204315c542f9c",
+          "address": "<ip>",
+          "token": "<token>",
           "model": "zhimi.humidifier.v1",
-          "temperatureSensor": {
-            "enabled": true,
-            "name": "Temperature"
-          },
-          "humiditySensor": {
-            "enabled": true,
-            "name": "Humidity"
-          },
+          "updateInterval": 30,
           "ledBulb": {
             "enabled": true,
-            "name": "Led backlight"
+            "name": "Humidifier LED"
           },
           "buzzerSwitch": {
             "enabled": true,
-            "name": "Buzzer"
+            "name": "Humidifier Buzzer"
+          },
+          "temperatureSensor": {
+            "enabled": true,
+            "name": "Humidifier Temperature"
+          },
+          "humiditySensor": {
+            "enabled": true,
+            "name": "Humidifier Humidity"
           }
         }
       ]
     }
-  ],
-  "accessories": []
+  ]
 }
 ```
+
 
 ### Humidifier configuration
 
 - `address` – device IP address;
 - `token` – device token (32 hex chars);
-- `model` – the model of a humidifier. Default is 'zhimi.humidifier.v1';
-- `name` – device name. Default is 'Humidifier';
-- `temperatureSensor.enabled` — if `true`, the temperature sensor will be added. Default is `false`;
-- `temperatureSensor.name` — temperature sensor name. Default is 'Temperature';
-- `humiditySensor.enabled` — if `true`, the humidity sensor will be added. Default is `false`;
-- `humiditySensor.name` — humidity sensor name. Default is 'Humidity';
+- `model` – the model of a humidifier, one of "zhimi.humidifier.v1", "zhimi.humidifier.ca1", "zhimi.humidifier.cb1", "zhimi.humidifier.ca4", "deerma.humidifier.mjjsq", "shuii.humidifier.jsq001". Default is "zhimi.humidifier.v1";
+- `name` – device name. Default is "Humidifier";
 - `ledBulb.enabled` — if `true`, the led backlight bulb will be added. Default is `false`;
-- `ledBulb.name` — led backlight bulb name. Default is 'Buzzer';
+- `ledBulb.name` — led backlight bulb name. Default is "Humidity LED";
 - `buzzerSwitch.enabled` — if `true`, the buzzer switch will be added. Default is `false`;
-- `buzzerSwitch.name` — buzzer switch name. Default is 'Buzzer';
+- `buzzerSwitch.name` — buzzer switch name. Default is "Humidifier Buzzer";
+- `temperatureSensor.enabled` — if `true`, the temperature sensor will be added. Default is `false`;
+- `temperatureSensor.name` — temperature sensor name. Default is "Humidifier Temperature";
+- `humiditySensor.enabled` — if `true`, the humidity sensor will be added. Default is `false`;
+- `humiditySensor.name` — humidity sensor name. Default is "Humidifier Humidity";
