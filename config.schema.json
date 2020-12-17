@@ -2,111 +2,112 @@
   "pluginAlias": "MiHumidifier",
   "pluginType": "platform",
   "schema": {
-    "title": "Devices",
-    "type": "array",
-    "items": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "title": "Name",
-          "type": "string",
-          "default": "Humidifier",
-          "minLength": 1
-        },
-        "address": {
-          "title": "IP address",
-          "type": "string",
-          "required": true
-        },
-        "token": {
-          "title": "Token",
-          "type": "string",
-          "pattern": "^[a-f0-9]{32}$",
-          "required": true
-        },
-        "model": {
-          "title": "Model",
-          "type": "string",
-          "enum": [
-            "zhimi.humidifier.v1",
-            "zhimi.humidifier.ca1",
-            "zhimi.humidifier.cb1",
-            "zhimi.humidifier.ca4",
-            "deerma.humidifier.mjjsq",
-            "shuii.humidifier.jsq001"
-          ],
-          "default": "zhimi.humidifier.v1"
-        },
-        "updateInterval": {
-          "title": "Parameters update interaval",
-          "type": "number",
-          "default": 30
-        },
-        "temperatureSensor": {
-          "title": "Temperature sensor",
-          "type": "object",
-          "properties": {
-            "enabled": {
-              "title": "Enable temperature sensor",
-              "type": "boolean",
-              "default": false
-            },
-            "name": {
-              "title": "Temperature sensor name",
-              "type": "string",
-              "default": "Temperature",
-              "minLength": 1
+    "devices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "default": "Humidifier",
+            "minLength": 1
+          },
+          "address": {
+            "title": "IP address",
+            "type": "string",
+            "required": true
+          },
+          "token": {
+            "title": "Token",
+            "type": "string",
+            "pattern": "^[a-f0-9]{32}$",
+            "required": true
+          },
+          "model": {
+            "title": "Model",
+            "type": "string",
+            "enum": [
+              "zhimi.humidifier.v1",
+              "zhimi.humidifier.ca1",
+              "zhimi.humidifier.cb1",
+              "zhimi.humidifier.ca4",
+              "deerma.humidifier.mjjsq",
+              "shuii.humidifier.jsq001"
+            ],
+            "default": "zhimi.humidifier.v1"
+          },
+          "updateInterval": {
+            "title": "Parameters update interaval",
+            "type": "number",
+            "default": 30
+          },
+          "temperatureSensor": {
+            "title": "Temperature sensor",
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "title": "Enable temperature sensor",
+                "type": "boolean",
+                "default": false
+              },
+              "name": {
+                "title": "Temperature sensor name",
+                "type": "string",
+                "default": "Temperature",
+                "minLength": 1
+              }
             }
-          }
-        },
-        "humiditySensor": {
-          "title": "Humidity sensor",
-          "type": "object",
-          "properties": {
-            "enabled": {
-              "title": "Enable humidity sensor",
-              "type": "boolean",
-              "default": false
-            },
-            "name": {
-              "title": "Humidity sensor name",
-              "type": "string",
-              "default": "Humidity",
-              "minLength": 1
+          },
+          "humiditySensor": {
+            "title": "Humidity sensor",
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "title": "Enable humidity sensor",
+                "type": "boolean",
+                "default": false
+              },
+              "name": {
+                "title": "Humidity sensor name",
+                "type": "string",
+                "default": "Humidity",
+                "minLength": 1
+              }
             }
-          }
-        },
-        "ledBulb": {
-          "title": "Led backlight bulb",
-          "type": "object",
-          "properties": {
-            "enabled": {
-              "title": "Enable led backlight bulb",
-              "type": "boolean",
-              "default": false
-            },
-            "name": {
-              "title": "Led backlight bulb name",
-              "type": "string",
-              "default": "Led",
-              "minLength": 1
+          },
+          "ledBulb": {
+            "title": "Led backlight bulb",
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "title": "Enable led backlight bulb",
+                "type": "boolean",
+                "default": false
+              },
+              "name": {
+                "title": "Led backlight bulb name",
+                "type": "string",
+                "default": "Led",
+                "minLength": 1
+              }
             }
-          }
-        },
-        "buzzerSwitch": {
-          "title": "Buzzer switch",
-          "type": "object",
-          "properties": {
-            "enabled": {
-              "title": "Enable buzzer switch",
-              "type": "boolean",
-              "default": false
-            },
-            "name": {
-              "title": "Buzzer switch name",
-              "type": "string",
-              "default": "Buzzer",
-              "minLength": 1
+          },
+          "buzzerSwitch": {
+            "title": "Buzzer switch",
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "title": "Enable buzzer switch",
+                "type": "boolean",
+                "default": false
+              },
+              "name": {
+                "title": "Buzzer switch name",
+                "type": "string",
+                "default": "Buzzer",
+                "minLength": 1
+              }
             }
           }
         }
