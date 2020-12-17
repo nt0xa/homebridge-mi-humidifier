@@ -1,6 +1,6 @@
 import * as miio from "miio-api";
 import { BasePropsType } from "../humidifier";
-import { ValueOf } from "../utils";
+import { ValueOf, mapSeries } from "../utils";
 
 /**
  * High level API for the device.
@@ -132,19 +132,21 @@ export abstract class BaseProtocol<
   async getProps(props: Array<keyof PropsType>): Promise<PropsType> {
     if (!this.getPropsPromise) {
       const maxProps = this.maxGetPropsNumber();
-      const promises = [];
+      const chunks = [];
 
       for (let i = 0; i < props.length; i += maxProps) {
-        const chunk = props.slice(i, i + maxProps);
-        promises.push(
-          this.device.call<GetArgType[], GetResultType[]>(
-            this.getCallName(),
-            this.prepareGetArgs(chunk),
-          ),
-        );
+        chunks.push(props.slice(i, i + maxProps));
       }
 
-      this.getPropsPromise = Promise.all(promises)
+      this.getPropsPromise = mapSeries<Array<keyof PropsType>, GetResultType[]>(
+        chunks,
+        async (chunk) => {
+          return await this.device.call<GetArgType[], GetResultType[]>(
+            this.getCallName(),
+            this.prepareGetArgs(chunk),
+          );
+        },
+      )
         .then((resultsArray) => {
           return this.mapGetResults(
             ([] as GetResultType[]).concat(...resultsArray),
