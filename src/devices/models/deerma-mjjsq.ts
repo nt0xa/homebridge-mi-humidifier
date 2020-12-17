@@ -30,6 +30,12 @@ type Props = {
   watertankstatus: State;
 };
 
+class Proto extends MiioProtocol<Props> {
+  maxGetPropsNumber() {
+    return 1;
+  }
+}
+
 export function deermaMJJSQ(
   device: miio.Device,
   Service: typeof hap.Service,
@@ -40,7 +46,7 @@ export function deermaMJJSQ(
   const feat = features<Props>(Service, Characteristic, log);
 
   return {
-    protocol: new MiioProtocol<Props>(device),
+    protocol: new Proto(device),
     features: [
       feat.currentState(),
       feat.targetState(),

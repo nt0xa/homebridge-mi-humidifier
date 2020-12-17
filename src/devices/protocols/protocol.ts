@@ -131,21 +131,29 @@ export abstract class BaseProtocol<
    */
   async getProps(props: Array<keyof PropsType>): Promise<PropsType> {
     if (!this.getPropsPromise) {
-      // Save promise.
-      this.getPropsPromise = new Promise<PropsType>((resolve, reject) => {
-        this.device
-          .call<GetArgType[], GetResultType[]>(
+      const maxProps = this.maxGetPropsNumber();
+      const promises = [];
+
+      for (let i = 0; i < props.length; i += maxProps) {
+        const chunk = props.slice(i, i + maxProps);
+        promises.push(
+          this.device.call<GetArgType[], GetResultType[]>(
             this.getCallName(),
-            this.prepareGetArgs(props),
-          )
-          .then((results) => {
-            resolve(this.mapGetResults(results, props));
-          })
-          .catch((err) => reject(err));
-      }).finally(() => {
-        // Unset saved promise.
-        this.getPropsPromise = null;
-      });
+            this.prepareGetArgs(chunk),
+          ),
+        );
+      }
+
+      this.getPropsPromise = Promise.all(promises)
+        .then((resultsArray) => {
+          return this.mapGetResults(
+            ([] as GetResultType[]).concat(...resultsArray),
+            props,
+          );
+        })
+        .finally(() => {
+          this.getPropsPromise = null;
+        });
     }
 
     // Return saved promise.
@@ -186,5 +194,12 @@ export abstract class BaseProtocol<
    */
   protected prepareGetArgs(props: Array<keyof PropsType>): GetArgType[] {
     return props.map((prop) => this.getCallArg(prop));
+  }
+
+  /**
+   * Defines how many properties can be requested in one `getProps` call.
+   */
+  protected maxGetPropsNumber(): number {
+    return 15;
   }
 }
