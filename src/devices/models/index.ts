@@ -1,4 +1,5 @@
 import type * as hap from "hap-nodejs";
+import type * as hb from "homebridge";
 import * as miio from "miio-api";
 import { DeviceOptions } from "../../platform";
 import { zhimiV1 } from "./zhimi-v1";
@@ -18,6 +19,7 @@ export type HumidifierConfigFunc<PropsType> = (
   device: miio.Device,
   Service: typeof hap.Service,
   Characteristic: typeof hap.Characteristic,
+  log: hb.Logging,
   options: DeviceOptions,
 ) => HumidifierConfig<PropsType>;
 

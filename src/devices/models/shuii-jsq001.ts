@@ -1,4 +1,5 @@
 import type * as hap from "hap-nodejs";
+import type * as hb from "homebridge";
 import * as miio from "miio-api";
 import { MiioProtocol } from "../protocols";
 import { DeviceOptions } from "../../platform";
@@ -7,7 +8,6 @@ import { features } from "../features";
 import { HumidifierConfig } from ".";
 
 enum Mode {
-  Off = -1,
   Level1 = 1,
   Level2 = 2,
   Level3 = 3,
@@ -66,9 +66,10 @@ export function shuiiJSQ001(
   device: miio.Device,
   Service: typeof hap.Service,
   Characteristic: typeof hap.Characteristic,
+  log: hb.Logging,
   options: DeviceOptions,
 ): HumidifierConfig<Props> {
-  const feat = features<Props>(Service, Characteristic);
+  const feat = features<Props>(Service, Characteristic, log);
 
   return {
     protocol: new Proto(device),
@@ -78,7 +79,6 @@ export function shuiiJSQ001(
       feat.active("power", "set_start", { on: State.On, off: State.Off }),
       feat.rotationSpeed("mode", "set_mode", {
         modes: [
-          Mode.Off,
           Mode.Level1,
           Mode.Level2,
           Mode.Level3,

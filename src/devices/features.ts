@@ -121,6 +121,7 @@ export interface Features<PropsType extends BasePropsType> {
 export function features<PropsType extends BasePropsType>(
   Service: typeof hap.Service,
   Characteristic: typeof hap.Characteristic,
+  log: hb.Logging,
 ): Features<PropsType> {
   return {
     currentState() {
@@ -174,21 +175,21 @@ export function features<PropsType extends BasePropsType>(
         service: Service.HumidifierDehumidifier,
         characteristic: Characteristic.RotationSpeed,
         props: {
-          minValue: 0,
-          maxValue: params.modes.length - 1,
+          minValue: 1,
+          maxValue: params.modes.length,
         },
         key: key,
         get: {
           map: (it) => {
             const index = params.modes.findIndex((mode) => mode === it);
-            return index > 0 ? index : 0;
+            return index > 0 ? index + 1 : 1;
           },
         },
         set: {
           call: setCall,
           map: (it) =>
-            it >= 0 && it < params.modes.length
-              ? params.modes[it as number]
+            it >= 1 && it <= params.modes.length
+              ? params.modes[(it as number) - 1]
               : params.modes[0],
         },
       };
@@ -346,18 +347,14 @@ export function features<PropsType extends BasePropsType>(
 
         {
           service: Service.Switch,
-          characteristic: Characteristic.Active,
+          characteristic: Characteristic.On,
           key: key,
           get: {
-            map: (it) =>
-              it === params.on
-                ? Characteristic.Active.ACTIVE
-                : Characteristic.Active.INACTIVE,
+            map: (it) => it === params.on,
           },
           set: {
             call: setCall,
-            map: (it) =>
-              it === Characteristic.Active.ACTIVE ? params.on : params.off,
+            map: (it) => (it ? params.on : params.off),
           },
         },
       ];

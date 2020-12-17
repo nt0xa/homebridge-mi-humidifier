@@ -1,4 +1,5 @@
 import type * as hap from "hap-nodejs";
+import type * as hb from "homebridge";
 import * as miio from "miio-api";
 import { MiioProtocol } from "../protocols";
 import { DeviceOptions } from "../../platform";
@@ -6,7 +7,6 @@ import { features } from "../features";
 import { HumidifierConfig } from ".";
 
 enum Gear {
-  Off = -1,
   Low = 1,
   Medium = 2,
   High = 3,
@@ -34,9 +34,10 @@ export function deermaMJJSQ(
   device: miio.Device,
   Service: typeof hap.Service,
   Characteristic: typeof hap.Characteristic,
+  log: hb.Logging,
   options: DeviceOptions,
 ): HumidifierConfig<Props> {
-  const feat = features<Props>(Service, Characteristic);
+  const feat = features<Props>(Service, Characteristic, log);
 
   return {
     protocol: new MiioProtocol<Props>(device),
@@ -48,7 +49,7 @@ export function deermaMJJSQ(
         off: State.Off,
       }),
       feat.rotationSpeed("Humidifier_Gear", "Set_HumidifierGears", {
-        modes: [Gear.Off, Gear.Low, Gear.Medium, Gear.High, Gear.Humidity],
+        modes: [Gear.Low, Gear.Medium, Gear.High, Gear.Humidity],
       }),
       feat.humidity("Humidity_Value"),
       feat.humidityThreshold("HumiSet_Value", "Set_HumiValue", {

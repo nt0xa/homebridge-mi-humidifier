@@ -176,8 +176,11 @@ export class BaseHumidifier<PropsType extends BasePropsType>
     callback: hb.CharacteristicSetCallback,
   ) {
     this.log.debug("Setting prop '%s'", entry.key);
+
     try {
       if (entry.beforeSet) {
+        this.log.debug("Executing beforeSet hook for '%s'", entry.key);
+
         const skip = await entry.beforeSet(
           value as PrimitiveType,
           entry.characteristic,
@@ -185,7 +188,10 @@ export class BaseHumidifier<PropsType extends BasePropsType>
           this.protocol,
         );
 
+        this.log.debug("beforeSet hook for '%s' returned", entry.key, skip);
+
         if (skip) {
+          this.log.debug("Skipping prop set '%s'", entry.key);
           callback();
           return;
         }

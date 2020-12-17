@@ -62,6 +62,7 @@ export async function createHumidifier(
     device,
     api.hap.Service,
     api.hap.Characteristic,
+    log,
     options,
   );
 

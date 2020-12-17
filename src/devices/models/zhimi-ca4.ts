@@ -1,4 +1,5 @@
 import type * as hap from "hap-nodejs";
+import type * as hb from "homebridge";
 import * as miio from "miio-api";
 import { MiotProtocol, MiotArg } from "../protocols";
 import { DeviceOptions } from "../../platform";
@@ -7,7 +8,6 @@ import { features } from "../features";
 import { HumidifierConfig } from ".";
 
 enum Mode {
-  Off = -1, // dummy
   Auto = 0,
   Low = 1,
   Medium = 2,
@@ -15,9 +15,9 @@ enum Mode {
 }
 
 enum LedState {
-  Bright = 0,
+  Off = 0,
   Dim = 1,
-  Off = 2,
+  Bright = 2,
 }
 
 type Props = {
@@ -74,9 +74,10 @@ export function zhimiCA4(
   device: miio.Device,
   Service: typeof hap.Service,
   Characteristic: typeof hap.Characteristic,
+  log: hb.Logging,
   options: DeviceOptions,
 ): HumidifierConfig<Props> {
-  const feat = features<Props>(Service, Characteristic);
+  const feat = features<Props>(Service, Characteristic, log);
 
   return {
     protocol: new Proto(device),
@@ -85,7 +86,7 @@ export function zhimiCA4(
       feat.targetState(),
       feat.active("power", "set_properties", { on: true, off: false }),
       feat.rotationSpeed("mode", "set_properties", {
-        modes: [Mode.Off, Mode.Low, Mode.Medium, Mode.High, Mode.Auto],
+        modes: [Mode.Low, Mode.Medium, Mode.High, Mode.Auto],
       }),
       feat.humidityThreshold("target_humidity", "set_properties"),
       feat.waterLevel("water_level", {

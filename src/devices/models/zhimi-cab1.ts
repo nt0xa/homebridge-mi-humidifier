@@ -1,4 +1,5 @@
 import type * as hap from "hap-nodejs";
+import type * as hb from "homebridge";
 import * as miio from "miio-api";
 
 import { DeviceOptions } from "../../platform";
@@ -8,7 +9,6 @@ import { CommonProps, zhimiCommon } from "./zhimi-common";
 import { HumidifierConfig } from ".";
 
 enum Mode {
-  Off = -1, // dummy
   Silent = "silent",
   Medium = "medium",
   High = "high",
@@ -26,15 +26,16 @@ type Props = CommonProps & {
 function common<PropsType extends Props>(
   Service: typeof hap.Service,
   Characteristic: typeof hap.Characteristic,
+  log: hb.Logging,
   options: DeviceOptions,
 ): Array<AnyCharacteristicConfig<PropsType>> {
-  const feat = features<PropsType>(Service, Characteristic);
+  const feat = features<PropsType>(Service, Characteristic, log);
 
   return [
     ...zhimiCommon<PropsType>(feat, options),
 
     feat.rotationSpeed("mode", "set_mode", {
-      modes: [Mode.Off, Mode.Silent, Mode.Medium, Mode.High, Mode.Auto],
+      modes: [Mode.Silent, Mode.Medium, Mode.High, Mode.Auto],
     }),
     feat.waterLevel("depth", {
       toChar: (it) => it / 1.2,
@@ -47,14 +48,15 @@ export function zhimiCA1(
   device: miio.Device,
   Service: typeof hap.Service,
   Characteristic: typeof hap.Characteristic,
+  log: hb.Logging,
   options: DeviceOptions,
 ): HumidifierConfig<Props> {
-  const feat = features<Props>(Service, Characteristic);
+  const feat = features<Props>(Service, Characteristic, log);
 
   return {
     protocol: new MiioProtocol<Props>(device),
     features: [
-      ...common<Props>(Service, Characteristic, options),
+      ...common<Props>(Service, Characteristic, log, options),
 
       ...(options.temperatureSensor?.enabled
         ? feat.temperatureSensor("temp_dec", {
@@ -70,14 +72,15 @@ export function zhimiCB1(
   device: miio.Device,
   Service: typeof hap.Service,
   Characteristic: typeof hap.Characteristic,
+  log: hb.Logging,
   options: DeviceOptions,
 ): HumidifierConfig<Props> {
-  const feat = features<Props>(Service, Characteristic);
+  const feat = features<Props>(Service, Characteristic, log);
 
   return {
     protocol: new MiioProtocol<Props>(device),
     features: [
-      ...common<Props>(Service, Characteristic, options),
+      ...common<Props>(Service, Characteristic, log, options),
 
       ...(options.temperatureSensor?.enabled
         ? feat.temperatureSensor("temperature", {
