@@ -95,7 +95,11 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
       // Store humidifier context to use later in polling function.
       this.devices.set(address, humidifier);
 
-      setInterval(this.update(address), config.updateInterval || 30000);
+      const update = this.update(address);
+      setInterval(update, config.updateInterval || 30000);
+
+      // Initial update.
+      await update();
     });
 
     // Unregister unused accessories.
