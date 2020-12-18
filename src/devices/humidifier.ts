@@ -51,6 +51,16 @@ export class BaseHumidifier<PropsType extends BasePropsType>
     this.features.forEach((feature) => {
       this.register(accessory, feature);
     });
+
+    const enabledServices = new Set(
+      this.features.map((feature) => feature.service.UUID),
+    );
+
+    accessory.services.forEach((service) => {
+      if (!enabledServices.has(service.getServiceId())) {
+        accessory.removeService(service);
+      }
+    });
   }
 
   /**
