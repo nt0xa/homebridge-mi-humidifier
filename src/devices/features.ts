@@ -3,6 +3,7 @@ import type * as hap from "hap-nodejs";
 import { BasePropsType, CharacteristicConfig } from "./humidifier";
 import { Protocol } from "./protocols";
 import { ValueOf } from "./utils";
+import { HumidifierModel } from "./models";
 
 export type AnyCharacteristicConfig<PropsType> = CharacteristicConfig<
   keyof PropsType,
@@ -18,6 +19,10 @@ type AnyBeforeSet<PropsType> = (
 type AnyMap<PropsType> = (it: ValueOf<PropsType>) => hb.CharacteristicValue;
 
 export interface Features<PropsType extends BasePropsType> {
+  accessoryInfo(
+    model: HumidifierModel,
+  ): Array<AnyCharacteristicConfig<PropsType>>;
+
   currentState(): AnyCharacteristicConfig<PropsType>;
 
   targetState(): AnyCharacteristicConfig<PropsType>;
@@ -124,6 +129,21 @@ export function features<PropsType extends BasePropsType>(
   log: hb.Logging,
 ): Features<PropsType> {
   return {
+    accessoryInfo(model) {
+      return [
+        {
+          service: Service.AccessoryInformation,
+          characteristic: Characteristic.Manufacturer,
+          value: "Xiaomi",
+        },
+        {
+          service: Service.AccessoryInformation,
+          characteristic: Characteristic.Model,
+          value: model,
+        },
+      ];
+    },
+
     currentState() {
       return {
         service: Service.HumidifierDehumidifier,
