@@ -4,7 +4,7 @@ import * as miio from "miio-api";
 
 import { DeviceOptions } from "../../platform";
 import { MiioProtocol } from "../protocols";
-import { features, AnyCharacteristicConfig } from "../features";
+import { Features, AnyCharacteristicConfig } from "../features";
 import { CommonProps, zhimiCommon } from "./zhimi-common";
 import { HumidifierConfig } from ".";
 
@@ -24,13 +24,10 @@ type Props = CommonProps & {
 };
 
 function common<PropsType extends Props>(
-  Service: typeof hap.Service,
-  Characteristic: typeof hap.Characteristic,
+  feat: Features<PropsType>,
   log: hb.Logging,
   options: DeviceOptions,
 ): Array<AnyCharacteristicConfig<PropsType>> {
-  const feat = features<PropsType>(Service, Characteristic, log);
-
   return [
     ...zhimiCommon<PropsType>(feat, options),
 
@@ -46,17 +43,14 @@ function common<PropsType extends Props>(
 
 export function zhimiCA1(
   device: miio.Device,
-  Service: typeof hap.Service,
-  Characteristic: typeof hap.Characteristic,
+  feat: Features<Props>,
   log: hb.Logging,
   options: DeviceOptions,
 ): HumidifierConfig<Props> {
-  const feat = features<Props>(Service, Characteristic, log);
-
   return {
     protocol: new MiioProtocol<Props>(device),
     features: [
-      ...common<Props>(Service, Characteristic, log, options),
+      ...common<Props>(feat, log, options),
 
       ...(options.temperatureSensor?.enabled
         ? feat.temperatureSensor("temp_dec", {
@@ -70,17 +64,14 @@ export function zhimiCA1(
 
 export function zhimiCB1(
   device: miio.Device,
-  Service: typeof hap.Service,
-  Characteristic: typeof hap.Characteristic,
+  feat: Features<Props>,
   log: hb.Logging,
   options: DeviceOptions,
 ): HumidifierConfig<Props> {
-  const feat = features<Props>(Service, Characteristic, log);
-
   return {
     protocol: new MiioProtocol<Props>(device),
     features: [
-      ...common<Props>(Service, Characteristic, log, options),
+      ...common<Props>(feat, log, options),
 
       ...(options.temperatureSensor?.enabled
         ? feat.temperatureSensor("temperature", {

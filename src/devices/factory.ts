@@ -6,6 +6,7 @@ import {
   HumidifierConfigFunc,
   HumidifierFactory,
 } from "./models";
+import { features } from "./features";
 import { BaseHumidifier } from "./humidifier";
 
 /**
@@ -50,6 +51,7 @@ export async function createHumidifier(
 ): Promise<Humidifier> {
   const device = await discover(address, token);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let configFunc: HumidifierConfigFunc<any>;
 
   if (model in HumidifierFactory) {
@@ -58,15 +60,16 @@ export async function createHumidifier(
     throw new HumidifierError(`Unsupported humidifier model "${model}"`);
   }
 
-  const { protocol, features } = configFunc(
-    device,
-    api.hap.Service,
-    api.hap.Characteristic,
-    log,
-    options,
-  );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const feat = features<any>(api.hap.Service, api.hap.Characteristic, log);
 
-  return new BaseHumidifier(protocol, features, log);
+  const { protocol, features: feats } = configFunc(device, feat, log, options);
+
+  return new BaseHumidifier(
+    protocol,
+    [...feat.accessoryInfo(model), ...feats],
+    log,
+  );
 }
 
 export interface Humidifier {

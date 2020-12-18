@@ -1,9 +1,8 @@
-import type * as hap from "hap-nodejs";
 import type * as hb from "homebridge";
 import * as miio from "miio-api";
 import { MiioProtocol } from "../protocols";
 import { DeviceOptions } from "../../platform";
-import { features } from "../features";
+import { Features } from "../features";
 import { HumidifierConfig } from ".";
 
 enum Gear {
@@ -38,13 +37,10 @@ class Proto extends MiioProtocol<Props> {
 
 export function deermaMJJSQ(
   device: miio.Device,
-  Service: typeof hap.Service,
-  Characteristic: typeof hap.Characteristic,
+  feat: Features<Props>,
   log: hb.Logging,
   options: DeviceOptions,
 ): HumidifierConfig<Props> {
-  const feat = features<Props>(Service, Characteristic, log);
-
   return {
     protocol: new Proto(device),
     features: [

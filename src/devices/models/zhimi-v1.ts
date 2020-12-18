@@ -1,10 +1,9 @@
-import type * as hap from "hap-nodejs";
 import type * as hb from "homebridge";
 import * as miio from "miio-api";
 import { DeviceOptions } from "../../platform";
 import { CommonProps, zhimiCommon } from "./zhimi-common";
 import { MiioProtocol } from "../protocols";
-import { features } from "../features";
+import { Features } from "../features";
 import { HumidifierConfig } from ".";
 
 enum Mode {
@@ -20,13 +19,10 @@ type Props = CommonProps & {
 
 export function zhimiV1(
   device: miio.Device,
-  Service: typeof hap.Service,
-  Characteristic: typeof hap.Characteristic,
+  feat: Features<Props>,
   log: hb.Logging,
   options: DeviceOptions,
 ): HumidifierConfig<Props> {
-  const feat = features<Props>(Service, Characteristic, log);
-
   return {
     protocol: new MiioProtocol<Props>(device),
     features: [

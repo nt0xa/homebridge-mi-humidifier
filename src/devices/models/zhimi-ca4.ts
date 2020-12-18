@@ -1,10 +1,9 @@
-import type * as hap from "hap-nodejs";
 import type * as hb from "homebridge";
 import * as miio from "miio-api";
 import { MiotProtocol, MiotArg } from "../protocols";
 import { DeviceOptions } from "../../platform";
 import { ValueOf } from "../utils";
-import { features } from "../features";
+import { Features } from "../features";
 import { HumidifierConfig } from ".";
 
 enum Mode {
@@ -72,13 +71,10 @@ class Proto extends MiotProtocol<Props> {
 
 export function zhimiCA4(
   device: miio.Device,
-  Service: typeof hap.Service,
-  Characteristic: typeof hap.Characteristic,
+  feat: Features<Props>,
   log: hb.Logging,
   options: DeviceOptions,
 ): HumidifierConfig<Props> {
-  const feat = features<Props>(Service, Characteristic, log);
-
   return {
     protocol: new Proto(device),
     features: [
