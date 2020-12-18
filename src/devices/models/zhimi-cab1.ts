@@ -76,7 +76,7 @@ export function zhimiCB1(
       ...(options.temperatureSensor?.enabled
         ? feat.temperatureSensor("temperature", {
             name: options.temperatureSensor.name,
-            toChar: (it) => it / 10,
+            toChar: (it) => it,
           })
         : []),
     ],
