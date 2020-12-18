@@ -96,7 +96,7 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
       this.devices.set(address, humidifier);
 
       const update = this.update(address);
-      setInterval(update, config.updateInterval || 30000);
+      setInterval(update, config.updateInterval * 1000 || 30000);
 
       // Initial update.
       await update();
