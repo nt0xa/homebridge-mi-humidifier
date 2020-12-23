@@ -1,6 +1,6 @@
 import * as hb from "homebridge";
 import { Humidifier, HumidifierModel, createHumidifier } from "./devices";
-import { validateConfig } from "./utils";
+import { validateConfig } from "./validation";
 
 export const PluginName = "homebridge-mi-humidifier";
 export const PlatformName = "MiHumidifier";
@@ -43,7 +43,9 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
       try {
         validateConfig(config);
       } catch (err) {
-        this.log.error(`Invalid config for device #${index}}.`, err);
+        this.log.error(
+          `Invalid config for device #${index}. ${err.constructor.name}: ${err.message}`,
+        );
         return;
       }
 
@@ -62,7 +64,9 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
           this.log,
         );
       } catch (err) {
-        this.log.error("%s. %s", err.message, err.cause || "");
+        this.log.error(
+          `Fail to initialize humidifier. ${err.constructor.name}: ${err.message}`,
+        );
         return;
       }
 
@@ -73,7 +77,7 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         accessory = this.accessories.get(address)!;
       } else {
-        this.log.info(`Registering new device with IP ${address}.`);
+        this.log.info(`Registering new device with IP "${address}".`);
 
         accessory = new this.api.platformAccessory(
           name || "Humidifier",
@@ -106,7 +110,7 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
     this.accessories.forEach((accessory, address) => {
       if (!this.config.devices.find((it) => it.address === address)) {
         this.log.warn(
-          `Unregistering device with IP ${address} because it wasn't found in config.json`,
+          `Unregistering device with IP "${address}" because it wasn't found in config.json`,
         );
 
         this.api.unregisterPlatformAccessories(PluginName, PlatformName, [
@@ -122,17 +126,16 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
 
       if (!humidifier) {
         this.log.warn(
-          `Can't find Humidifier object for the device with IP ${address}.`,
+          `Can't find Humidifier object for the device with IP "${address}".`,
         );
         return;
       }
 
       try {
-        humidifier.update();
+        await humidifier.update();
       } catch (err) {
         this.log.error(
-          "Fail to update characteristics of the device with IP %s.",
-          address,
+          `Fail to update characteristics of the device with IP "${address}".`,
         );
       }
     };

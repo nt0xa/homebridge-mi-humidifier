@@ -76,16 +76,17 @@ export class BaseHumidifier<PropsType extends BasePropsType>
         this.props.map((prop) => prop.key),
       );
       this.props.forEach((prop) => {
+        const propValue = this.cache[prop.key];
+        const charValue = prop.map(propValue);
         this.log.debug(
-          "Updating prop",
-          prop.key,
-          this.cache[prop.key],
-          prop.map(this.cache[prop.key]),
+          `Updating property "${prop.key}": ${propValue} -> ${charValue}`,
         );
-        prop.characteristic.updateValue(prop.map(this.cache[prop.key]));
+        prop.characteristic.updateValue(charValue);
       });
     } catch (err) {
-      this.log.error("Fail to get props.", err);
+      this.log.error(
+        `Fail to get device properties. ${err.constructor.name}: ${err.message}`,
+      );
     }
   }
 
@@ -166,7 +167,7 @@ export class BaseHumidifier<PropsType extends BasePropsType>
     entry: GetEntry<PropsType>,
     callback: hb.CharacteristicGetCallback,
   ): void {
-    this.log.debug("Getting prop '%s'", entry.key);
+    this.log.debug(`Getting property "${entry.key}"`);
     callback(null, entry.map(this.cache[entry.key]));
   }
 
@@ -185,11 +186,11 @@ export class BaseHumidifier<PropsType extends BasePropsType>
     value: hb.CharacteristicValue,
     callback: hb.CharacteristicSetCallback,
   ) {
-    this.log.debug("Setting prop '%s'", entry.key);
+    this.log.debug(`Setting property "${entry.key}" to ${value}`);
 
     try {
       if (entry.beforeSet) {
-        this.log.debug("Executing beforeSet hook for '%s'", entry.key);
+        this.log.debug(`Executing "beforeSet" hook for "${entry.key}"`);
 
         const skip = await entry.beforeSet(
           value as PrimitiveType,
@@ -198,10 +199,10 @@ export class BaseHumidifier<PropsType extends BasePropsType>
           this.protocol,
         );
 
-        this.log.debug("beforeSet hook for '%s' returned", entry.key, skip);
+        this.log.debug(`"beforeSet" hook for "${entry.key} returned "${skip}"`);
 
         if (skip) {
-          this.log.debug("Skipping prop set '%s'", entry.key);
+          this.log.debug(`Skipping property set "${entry.key}`);
           callback();
           return;
         }
@@ -211,7 +212,9 @@ export class BaseHumidifier<PropsType extends BasePropsType>
 
       callback();
     } catch (err) {
-      this.log.error("Fail to set property '%s'.", entry.key, err);
+      this.log.error(
+        `Fail to set device property "${entry.key}". ${err.constructor.name}: ${err.message}`,
+      );
       callback(err);
     }
   }

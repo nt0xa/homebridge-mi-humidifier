@@ -19,18 +19,26 @@ function isValidModel(model: HumidifierModel): boolean {
 
 export function validateConfig(config: DeviceConfig): void {
   if (!config.address || !isValidIP(config.address)) {
-    throw new Error(`Ivalid IP address ${config.address}`);
+    throw new ValidationError(`Ivalid IP address "${config.address}"`);
   }
 
   if (!config.token || !isValidToken(config.token)) {
-    throw new Error(`Ivalid device token ${config.token}`);
+    throw new ValidationError(`Ivalid device token "${config.token}"`);
   }
 
   if (!config.model || !isValidModel(config.model)) {
-    throw new Error(
-      `Invalid device model ${config.model}. Expected one of ${Object.values(
+    throw new ValidationError(
+      `Invalid device model "${config.model}". Expected one of ${Object.values(
         HumidifierModel,
-      ).join(", ")}`,
+      )
+        .map((v) => `"${v}"`)
+        .join(", ")}`,
     );
+  }
+}
+
+export class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
   }
 }
