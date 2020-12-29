@@ -11,19 +11,19 @@ export class Logger {
   }
 
   info(message: string, ...parameters: any[]): void {
-    this.log.info(this.prefix + message, parameters);
+    this.log.info(this.prefix + message, ...parameters);
   }
 
   warn(message: string, ...parameters: any[]): void {
-    this.log.warn(this.prefix + message, parameters);
+    this.log.warn(this.prefix + message, ...parameters);
   }
 
   error(message: string, ...parameters: any[]): void {
-    this.log.error(this.prefix + message, parameters);
+    this.log.error(this.prefix + message, ...parameters);
   }
 
   debug(message: string, ...parameters: any[]): void {
-    this.log.debug(this.prefix + message, parameters);
+    this.log.debug(this.prefix + message, ...parameters);
   }
 }
 /* eslint-enable  @typescript-eslint/no-explicit-any */
