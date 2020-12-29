@@ -6,6 +6,7 @@ import { Humidifier } from "./factory";
 import { AnyCharacteristicConfig } from "./features";
 import { Protocol } from "./protocols/protocol";
 import { ValueOf } from "./utils";
+import { Logger } from "./logger";
 
 /**
  * Base class for all humidifiers, all humidifiers must inherit from this class.
@@ -18,7 +19,7 @@ export class BaseHumidifier<PropsType extends BasePropsType>
   implements Humidifier {
   private readonly protocol: Protocol<PropsType>;
   private readonly features: Array<AnyCharacteristicConfig<PropsType>>;
-  private readonly log: hb.Logging;
+  private readonly log: Logger;
 
   private props: GetEntry<PropsType>[];
   private cache: PropsType;
@@ -30,7 +31,7 @@ export class BaseHumidifier<PropsType extends BasePropsType>
   constructor(
     protocol: Protocol<PropsType>,
     featues: Array<AnyCharacteristicConfig<PropsType>>,
-    log: hb.Logging,
+    log: Logger,
   ) {
     this.protocol = protocol;
     this.features = featues;

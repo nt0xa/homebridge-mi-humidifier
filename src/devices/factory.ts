@@ -8,6 +8,7 @@ import {
 } from "./models";
 import { features } from "./features";
 import { BaseHumidifier } from "./humidifier";
+import { Logger } from "./logger";
 
 /**
  * Partial miIO.info call result.
@@ -68,7 +69,7 @@ export async function createHumidifier(
   return new BaseHumidifier(
     protocol,
     [...feat.accessoryInfo(model), ...feats],
-    log,
+    new Logger(log, `[${address}] `),
   );
 }
 
