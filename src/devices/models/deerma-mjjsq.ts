@@ -44,8 +44,11 @@ export function deermaMJJSQ(
   return {
     protocol: new Proto(device),
     features: [
-      feat.currentState(),
       feat.targetState(),
+      feat.currentState("OnOff_State", {
+        on: State.On,
+        off: State.Off,
+      }),
       feat.active("OnOff_State", "Set_OnOff", {
         on: State.On,
         off: State.Off,
@@ -54,24 +57,7 @@ export function deermaMJJSQ(
         modes: [Gear.Low, Gear.Medium, Gear.High, Gear.Humidity],
       }),
       feat.humidity("Humidity_Value"),
-      feat.humidityThreshold("HumiSet_Value", "Set_HumiValue", {
-        beforeSet: async (_value, _characteristic, callback, protocol) => {
-          // There is special mode for humidity threshold - Gear.Humidity,
-          // so set mode to Gear.Humidity.
-          try {
-            await protocol.setProp(
-              "HumiSet_Value",
-              "Set_HumiValue",
-              Gear.Humidity,
-            );
-          } catch (err) {
-            callback(err);
-            return true;
-          }
-
-          return false;
-        },
-      }),
+      feat.humidityThreshold("HumiSet_Value", "Set_HumiValue"),
       feat.waterLevel("waterstatus", { toChar: (it) => it * 100 }),
 
       ...(options.ledBulb?.enabled

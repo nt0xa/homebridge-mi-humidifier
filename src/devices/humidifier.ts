@@ -95,7 +95,7 @@ export class BaseHumidifier<PropsType extends BasePropsType>
    */
   register<PropsKey extends keyof PropsType>(
     accessory: PlatformAccessory,
-    config: CharacteristicConfig<PropsKey, PropsType[PropsKey]>,
+    config: CharacteristicConfig<PropsType, PropsKey, PropsType[PropsKey]>,
   ): void {
     const service =
       accessory.getService(config.service) ||
@@ -192,12 +192,12 @@ export class BaseHumidifier<PropsType extends BasePropsType>
       if (entry.beforeSet) {
         this.log.debug(`Executing "beforeSet" hook for "${entry.key}"`);
 
-        const skip = await entry.beforeSet(
-          value as PrimitiveType,
-          entry.characteristic,
-          callback,
-          this.protocol,
-        );
+        const skip = await entry.beforeSet({
+          value: value as PrimitiveType,
+          characteristic: entry.characteristic,
+          callback: callback,
+          protocol: this.protocol,
+        });
 
         this.log.debug(`"beforeSet" hook for "${entry.key} returned "${skip}"`);
 
@@ -234,22 +234,30 @@ export type BasePropsType = { [key: string]: PrimitiveType };
 /**
  * Function that maps device property value to corresponding characteristic value.
  */
-type GetMapFunc<PropsType> = (it: ValueOf<PropsType>) => hb.CharacteristicValue;
+export type GetMapFunc<PropsType> = (
+  it: ValueOf<PropsType>,
+) => hb.CharacteristicValue;
 
 /**
  * Function that maps characteristic value to corresponding device property value.
  */
-type SetMapFunc<PropsType> = (it: hb.CharacteristicValue) => ValueOf<PropsType>;
+export type SetMapFunc<PropsType> = (
+  it: hb.CharacteristicValue,
+) => ValueOf<PropsType>;
 
 /**
  * Function that is called before settings the device property.
  */
-type BeforeSetFunc<PropsType> = (
-  value: PrimitiveType,
-  characteristic: hb.Characteristic,
-  callback: hb.CharacteristicSetCallback,
-  protocol: Protocol<PropsType>,
-) => Promise<boolean>;
+export type BeforeSetFunc<PropsType> = (
+  args: BeforeSetFuncArgs<PropsType>,
+) => boolean | Promise<boolean>;
+
+export type BeforeSetFuncArgs<PropsType> = {
+  value: PrimitiveType;
+  characteristic: hb.Characteristic;
+  callback: hb.CharacteristicSetCallback;
+  protocol: Protocol<PropsType>;
+};
 
 /**
  * GetEntry contains all required information
@@ -300,9 +308,9 @@ export type Service = hb.WithUUID<typeof hap.Service>;
 /**
  * CharacteristicConfig is used to register characteristic for accessory.
  */
-export type CharacteristicConfig<PropKey, PropValue> =
+export type CharacteristicConfig<PropsType, PropKey, PropValue> =
   | CharacteristicConfigStatic
-  | CharacteristicConfigDynamic<PropKey, PropValue>;
+  | CharacteristicConfigDynamic<PropsType, PropKey, PropValue>;
 
 export type CharacteristicConfigStatic = {
   // HomeKit service.
@@ -315,7 +323,7 @@ export type CharacteristicConfigStatic = {
   value: hb.CharacteristicValue;
 };
 
-export type CharacteristicConfigDynamic<PropKey, PropValue> = {
+export type CharacteristicConfigDynamic<PropsType, PropKey, PropValue> = {
   // HomeKit service.
   service: Service;
 
@@ -348,11 +356,6 @@ export type CharacteristicConfigDynamic<PropKey, PropValue> = {
     // Function that is called before settings the device property.
     // Can be used to add some extra logic.
     // If returns `true` set will be skipped.
-    beforeSet?: <PropsType>(
-      value: PropValue,
-      characteristic: hb.Characteristic,
-      callback: hb.CharacteristicSetCallback,
-      protocol: Protocol<PropsType>,
-    ) => boolean | Promise<boolean>;
+    beforeSet?: BeforeSetFunc<PropsType>;
   };
 };

@@ -21,8 +21,8 @@ export function zhimiCommon<PropsType extends CommonProps>(
   options: DeviceOptions,
 ): Array<AnyCharacteristicConfig<PropsType>> {
   return [
-    feat.currentState(),
     feat.targetState(),
+    feat.currentState("power", { on: "on", off: "off" }),
     feat.active("power", "set_power", { on: "on", off: "off" }),
     feat.humidityThreshold("limit_hum", "set_limit_hum"),
     feat.lockPhysicalControls("child_lock", "set_child_lock", {

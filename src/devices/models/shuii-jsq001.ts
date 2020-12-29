@@ -70,8 +70,8 @@ export function shuiiJSQ001(
   return {
     protocol: new Proto(device),
     features: [
-      feat.currentState(),
       feat.targetState(),
+      feat.currentState("power", { on: State.On, off: State.Off }),
       feat.active("power", "set_start", { on: State.On, off: State.Off }),
       feat.rotationSpeed("mode", "set_mode", {
         modes: [

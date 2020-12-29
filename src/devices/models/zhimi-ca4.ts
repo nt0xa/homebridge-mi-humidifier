@@ -78,8 +78,8 @@ export function zhimiCA4(
   return {
     protocol: new Proto(device),
     features: [
-      feat.currentState(),
       feat.targetState(),
+      feat.currentState("power", { on: true, off: false }),
       feat.active("power", "set_properties", { on: true, off: false }),
       feat.rotationSpeed("mode", "set_properties", {
         modes: [Mode.Low, Mode.Medium, Mode.High, Mode.Auto],

@@ -1,29 +1,32 @@
 import type * as hb from "homebridge";
 import type * as hap from "hap-nodejs";
-import { BasePropsType, CharacteristicConfig } from "./humidifier";
-import { Protocol } from "./protocols";
+import {
+  BasePropsType,
+  CharacteristicConfig,
+  BeforeSetFunc,
+  GetMapFunc,
+} from "./humidifier";
 import { ValueOf } from "./utils";
 import { HumidifierModel } from "./models";
 
 export type AnyCharacteristicConfig<PropsType> = CharacteristicConfig<
+  PropsType,
   keyof PropsType,
   ValueOf<PropsType>
 >;
-
-type AnyBeforeSet<PropsType> = (
-  value: ValueOf<PropsType>,
-  characteristic: hb.Characteristic,
-  callback: hb.CharacteristicSetCallback,
-) => boolean | Promise<boolean>;
-
-type AnyMap<PropsType> = (it: ValueOf<PropsType>) => hb.CharacteristicValue;
 
 export interface Features<PropsType extends BasePropsType> {
   accessoryInfo(
     model: HumidifierModel,
   ): Array<AnyCharacteristicConfig<PropsType>>;
 
-  currentState(): AnyCharacteristicConfig<PropsType>;
+  currentState<PropKey extends keyof PropsType>(
+    key: PropKey,
+    params: {
+      on: PropsType[PropKey];
+      off: PropsType[PropKey];
+    },
+  ): AnyCharacteristicConfig<PropsType>;
 
   targetState(): AnyCharacteristicConfig<PropsType>;
 
@@ -52,12 +55,7 @@ export interface Features<PropsType extends BasePropsType> {
     key: PropKey,
     setCall: string,
     params?: {
-      beforeSet?: (
-        value: PropsType[PropKey],
-        characteristic: hb.Characteristic,
-        callback: hb.CharacteristicSetCallback,
-        protocol: Protocol<PropsType>,
-      ) => boolean | Promise<boolean>;
+      beforeSet?: BeforeSetFunc<PropsType>;
     },
   ): AnyCharacteristicConfig<PropsType>;
 
@@ -144,7 +142,7 @@ export function features<PropsType extends BasePropsType>(
       ];
     },
 
-    currentState() {
+    currentState(key, params) {
       return {
         service: Service.HumidifierDehumidifier,
         characteristic: Characteristic.CurrentHumidifierDehumidifierState,
@@ -154,7 +152,13 @@ export function features<PropsType extends BasePropsType>(
             Characteristic.CurrentHumidifierDehumidifierState.HUMIDIFYING,
           ],
         },
-        value: Characteristic.CurrentHumidifierDehumidifierState.HUMIDIFYING,
+        key: key,
+        get: {
+          map: (it) =>
+            it === params.on
+              ? Characteristic.CurrentHumidifierDehumidifierState.HUMIDIFYING
+              : Characteristic.CurrentHumidifierDehumidifierState.INACTIVE,
+        },
       };
     },
 
@@ -243,7 +247,7 @@ export function features<PropsType extends BasePropsType>(
         set: {
           call: setCall,
           map: (it) => it as PropsType[typeof key],
-          beforeSet: params.beforeSet as AnyBeforeSet<PropsType>,
+          beforeSet: params.beforeSet as BeforeSetFunc<PropsType>,
         },
       };
     },
@@ -275,7 +279,7 @@ export function features<PropsType extends BasePropsType>(
         characteristic: Characteristic.WaterLevel,
         key: key,
         get: {
-          map: params.toChar as AnyMap<PropsType>,
+          map: params.toChar as GetMapFunc<PropsType>,
         },
       };
     },
@@ -345,7 +349,7 @@ export function features<PropsType extends BasePropsType>(
         set: {
           call: setCall,
           map: (it) => (it ? params.on : params.off),
-          beforeSet: (value, characteristic) => {
+          beforeSet: ({ value, characteristic }) => {
             // HomeKit trying to set "On" to true after changing brightness
             // which cause switching brightness back to Dim.
             // So skip set if bulb has already turned on.
@@ -407,7 +411,7 @@ export function features<PropsType extends BasePropsType>(
           characteristic: Characteristic.CurrentTemperature,
           key: key,
           get: {
-            map: params.toChar as AnyMap<PropsType>,
+            map: params.toChar as GetMapFunc<PropsType>,
           },
         },
       ];
