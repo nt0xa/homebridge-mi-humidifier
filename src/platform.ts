@@ -37,6 +37,11 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
    * registering any new accessories.
    */
   async didFinishLaunching(): Promise<void> {
+    if (!Array.isArray(this.config.devices)) {
+      this.log.error(`Invalid "devices" value, expected array`);
+      return;
+    }
+
     // Register new accessories.
     this.config.devices.forEach(async (config, index) => {
       // Validate config before creating device.
