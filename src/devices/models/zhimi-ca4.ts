@@ -84,7 +84,10 @@ export function zhimiCA4(
       feat.rotationSpeed("mode", "set_properties", {
         modes: [Mode.Low, Mode.Medium, Mode.High, Mode.Auto],
       }),
-      feat.humidityThreshold("target_humidity", "set_properties"),
+      feat.humidityThreshold("target_humidity", "set_properties", {
+        min: 30,
+        max: 80,
+      }),
       feat.waterLevel("water_level", {
         toChar: (it) => it / 1.2,
       }),

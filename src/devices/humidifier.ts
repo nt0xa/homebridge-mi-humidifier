@@ -135,9 +135,10 @@ export class BaseHumidifier<PropsType extends BasePropsType>
           call: config.set.call,
           characteristic: characteristic,
           map: config.set.map
-            ? (config.set.map as SetMapFunc<PropsType>)
+            ? config.set.map
             : (it: hb.CharacteristicValue) => it as ValueOf<PropsType>, // by default use the same value.
-          beforeSet: config.set.beforeSet as BeforeSetFunc<PropsType>,
+          beforeSet: config.set.beforeSet,
+          afterSet: config.set.afterSet,
         };
 
         characteristic.on(
@@ -190,26 +191,30 @@ export class BaseHumidifier<PropsType extends BasePropsType>
     this.log.debug(`Setting property "${entry.key}" to ${value}`);
 
     try {
-      if (entry.beforeSet) {
-        this.log.debug(`Executing "beforeSet" hook for "${entry.key}"`);
+      let skipSet;
 
-        const skip = await entry.beforeSet({
-          value: value as PrimitiveType,
+      if (entry.beforeSet) {
+        skipSet = await entry.beforeSet({
+          value,
           characteristic: entry.characteristic,
-          callback: callback,
           protocol: this.protocol,
         });
-
-        this.log.debug(`"beforeSet" hook for "${entry.key} returned "${skip}"`);
-
-        if (skip) {
-          this.log.debug(`Skipping property set "${entry.key}`);
-          callback();
-          return;
-        }
       }
 
-      await this.protocol.setProp(entry.key, entry.call, entry.map(value));
+      const mappedValue = entry.map(value);
+
+      if (skipSet !== true) {
+        await this.protocol.setProp(entry.key, entry.call, mappedValue);
+      }
+
+      if (entry.afterSet) {
+        await entry.afterSet({
+          value,
+          mappedValue,
+          characteristic: entry.characteristic,
+          protocol: this.protocol,
+        });
+      }
 
       callback();
     } catch (err) {
@@ -251,12 +256,25 @@ export type SetMapFunc<PropsType> = (
  */
 export type BeforeSetFunc<PropsType> = (
   args: BeforeSetFuncArgs<PropsType>,
-) => boolean | Promise<boolean>;
+) => boolean | Promise<boolean> | undefined;
 
 export type BeforeSetFuncArgs<PropsType> = {
-  value: PrimitiveType;
+  value: hb.CharacteristicValue;
   characteristic: hb.Characteristic;
-  callback: hb.CharacteristicSetCallback;
+  protocol: Protocol<PropsType>;
+};
+
+/**
+ * Function that is called after settings the device property.
+ */
+export type AfterSetFunc<PropsType> = (
+  args: AfterSetFuncArgs<PropsType>,
+) => void | Promise<void>;
+
+export type AfterSetFuncArgs<PropsType> = {
+  value: hb.CharacteristicValue;
+  mappedValue: PrimitiveType;
+  characteristic: hb.Characteristic;
   protocol: Protocol<PropsType>;
 };
 
@@ -296,8 +314,11 @@ export type SetEntry<PropsType> = {
 
   // Function that is called before settings the device property.
   // Can be used to add some extra logic.
-  // If returns `true` set will be skipped.
   beforeSet?: BeforeSetFunc<PropsType>;
+
+  // Function that is called after settings the device property.
+  // Can be used to add some extra logic.
+  afterSet?: AfterSetFunc<PropsType>;
 };
 
 /**
@@ -356,7 +377,11 @@ export type CharacteristicConfigDynamic<PropsType, PropKey, PropValue> = {
 
     // Function that is called before settings the device property.
     // Can be used to add some extra logic.
-    // If returns `true` set will be skipped.
+    // You can return "true" to skip property set call.
     beforeSet?: BeforeSetFunc<PropsType>;
+
+    // Function that is called before settings the device property.
+    // Can be used to add some extra logic.
+    afterSet?: AfterSetFunc<PropsType>;
   };
 };

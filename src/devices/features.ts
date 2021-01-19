@@ -54,8 +54,9 @@ export interface Features<PropsType extends BasePropsType> {
   humidityThreshold<PropKey extends keyof PropsType>(
     key: PropKey,
     setCall: string,
-    params?: {
-      beforeSet?: BeforeSetFunc<PropsType>;
+    params: {
+      min: number;
+      max: number;
     },
   ): AnyCharacteristicConfig<PropsType>;
 
@@ -232,22 +233,32 @@ export function features<PropsType extends BasePropsType>(
       };
     },
 
-    humidityThreshold(key, setCall, params = {}) {
+    humidityThreshold(key, setCall, params) {
       return {
         service: Service.HumidifierDehumidifier,
         characteristic: Characteristic.RelativeHumidityHumidifierThreshold,
-        props: {
-          minValue: 30,
-          maxValue: 80,
-        },
         key: key,
         get: {
           map: (it) => it,
         },
         set: {
           call: setCall,
-          map: (it) => it as PropsType[typeof key],
-          beforeSet: params.beforeSet as BeforeSetFunc<PropsType>,
+          map: (it) => {
+            if (it < params.min) {
+              it = params.min;
+            } else if (it > params.max) {
+              it = params.max;
+            }
+
+            return it as PropsType[typeof key];
+          },
+          afterSet: ({ characteristic, mappedValue }) => {
+            // Update characteristic immediatly not immediately so
+            // udpating it after a small delay.
+            setTimeout(() => {
+              characteristic.updateValue(mappedValue);
+            }, 200);
+          },
         },
       };
     },

@@ -57,7 +57,10 @@ export function deermaMJJSQ(
         modes: [Gear.Low, Gear.Medium, Gear.High, Gear.Humidity],
       }),
       feat.humidity("Humidity_Value"),
-      feat.humidityThreshold("HumiSet_Value", "Set_HumiValue"),
+      feat.humidityThreshold("HumiSet_Value", "Set_HumiValue", {
+        min: 40,
+        max: 70,
+      }),
       feat.waterLevel("waterstatus", { toChar: (it) => it * 100 }),
 
       ...(options.ledBulb?.enabled
