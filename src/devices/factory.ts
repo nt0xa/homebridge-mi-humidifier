@@ -68,7 +68,7 @@ export async function createHumidifier(
 
   return new BaseHumidifier(
     protocol,
-    [...feat.accessoryInfo(model), ...feats],
+    [...feat.accessoryInfo(model, device.id), ...feats],
     new Logger(log, `[${address}] `),
   );
 }
