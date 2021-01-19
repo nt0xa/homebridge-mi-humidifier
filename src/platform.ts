@@ -44,6 +44,18 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
 
     // Register new accessories.
     this.config.devices.forEach(async (config, index) => {
+      // Skip disabled devices.
+      if (config.disabled) {
+        // Unregister accessory if exists.
+        const accessory = this.accessories.get(config.address);
+        if (accessory) {
+          this.api.unregisterPlatformAccessories(PluginName, PlatformName, [
+            accessory,
+          ]);
+        }
+        return;
+      }
+
       // Validate config before creating device.
       try {
         validateConfig(config);
@@ -173,6 +185,7 @@ export type DeviceOptions = {
  * Parameters required to configure device.
  */
 export type DeviceConfig = {
+  disabled?: boolean;
   name?: string;
   address: string;
   token: string;
