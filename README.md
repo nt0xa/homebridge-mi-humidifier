@@ -53,7 +53,7 @@ A Xiaomi Mi humidifier plugin for Homebridge.
 
 - `address` – device IP address;
 - `token` – device token (32 hex chars);
-- `model` – the model of a humidifier, one of "zhimi.humidifier.v1", "zhimi.humidifier.ca1", "zhimi.humidifier.cb1", "zhimi.humidifier.ca4", "deerma.humidifier.mjjsq", "shuii.humidifier.jsq001". Default is "zhimi.humidifier.v1";
+- `model` – the model of a humidifier, one of "zhimi.humidifier.v1", "zhimi.humidifier.ca1", "zhimi.humidifier.cb1", "zhimi.humidifier.ca4", "deerma.humidifier.mjjsq", "deerma.humidifier.jsq4", "shuii.humidifier.jsq001". Default is "zhimi.humidifier.v1";
 - `name` – device name. Default is "Humidifier";
 - `ledBulb.enabled` — if `true`, the led backlight bulb will be added. Default is `false`;
 - `ledBulb.name` — led backlight bulb name. Default is "Humidity LED";
