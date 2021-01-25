@@ -20,6 +20,7 @@ type Props = {
   relative_humidity: number;
   switch_status: boolean;
   buzzer: boolean;
+  temperature: number;
 };
 
 class Proto extends MiotProtocol<Props> {
@@ -49,6 +50,8 @@ class Proto extends MiotProtocol<Props> {
         return { ...common, siid: 6, piid: 1 };
       case "buzzer":
         return { ...common, siid: 5, piid: 1 };
+      case "temperature":
+        return { ...common, siid: 3, piid: 7 };
     }
   }
 }
@@ -96,6 +99,13 @@ export function deermaJSQ4(
       ...(options.humiditySensor?.enabled
         ? feat.humiditySensor("relative_humidity", {
             name: options.humiditySensor.name,
+          })
+        : []),
+
+      ...(options.temperatureSensor?.enabled
+        ? feat.temperatureSensor("temperature", {
+            name: options.temperatureSensor.name,
+            toChar: (it) => it,
           })
         : []),
     ],
