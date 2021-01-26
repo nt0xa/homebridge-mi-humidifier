@@ -118,7 +118,7 @@ Model: `deerma.humidifier.mjjsq` / `deerma.humidifier.jsq001`
 
 Model №: SCK0A45, ZNJSQ01DEM, MJJSQ03DY
 
-<img src="./.github/assets/deerma-humidifier-mjjsq.png" width="350px" />
+<img src="./.github/assets/deerma-humidifier-mjjsq.png" width="300px" />
 
 ### Mijia Pure Smart Humidifier
 
