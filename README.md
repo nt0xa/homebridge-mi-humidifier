@@ -19,32 +19,32 @@ npm install -g homebridge-mi-humidifier
 Add the following part to the "platforms" section of your [Homebridge config](https://github.com/homebridge/homebridge/wiki/Homebridge-Config-JSON-Explained):
 
 ```json
+{
+  "platform": "MiHumidifier",
+  "devices": [
     {
-      "platform": "MiHumidifier",
-      "devices": [
-        {
-          "name": "Humidifier",
-          "address": "<ip>",
-          "token": "<token>",
-          "model": "zhimi.humidifier.v1",
-          "updateInterval": 30,
-          "disabled": false,
-          "ledBulb": {
-            "enabled": true,
-            "name": "Humidifier LED"
-          },
-          "buzzerSwitch": {
-            "enabled": true,
-            "name": "Humidifier Buzzer"
-          },
-          "temperatureSensor": {
-            "enabled": true,
-            "name": "Humidifier Temperature"
-          },
-          "humiditySensor": {
-            "enabled": true,
-            "name": "Humidifier Humidity"
-          }
+      "name": "Humidifier",
+      "address": "<ip>",
+      "token": "<token>",
+      "model": "zhimi.humidifier.v1",
+      "updateInterval": 30,
+      "disabled": false,
+      "ledBulb": {
+        "enabled": true,
+        "name": "Humidifier LED"
+      },
+      "buzzerSwitch": {
+        "enabled": true,
+        "name": "Humidifier Buzzer"
+      },
+      "temperatureSensor": {
+        "enabled": true,
+        "name": "Humidifier Temperature"
+      },
+      "humiditySensor": {
+        "enabled": true,
+        "name": "Humidifier Humidity"
+      }
     }
   ]
 }
