@@ -12,11 +12,7 @@
     "lint": "tsc --noEmit && eslint --ext ts src",
     "watch": "tsc --watch"
   },
-  "keywords": [
-    "homebridge-plugin",
-    "xiaomi",
-    "humidifier"
-  ],
+  "keywords": ["homebridge-plugin", "xiaomi", "humidifier"],
   "repository": {
     "type": "git",
     "url": "https://github.com/russtone/homebridge-mi-humidifier.git"
@@ -39,5 +35,6 @@
     "homebridge": "^1.2.3",
     "prettier": "^2.1.2",
     "typescript": "^4.0.3"
-  }
+  },
+  "files": ["dist"]
 }
