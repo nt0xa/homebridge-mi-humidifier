@@ -110,7 +110,7 @@ Model: `shuii.humidifier.jsq001`
 
 Model №: DWZF(G)-2100Z
 
-<img src="./.github/assets/shuii-humidifier-jsq001.jpg" width="400px" />
+<img src="./.github/assets/shuii-humidifier-jsq001.jpg" width="300px" />
 
 ### Mijia Smart Sterilization Humidifier (S)
 
