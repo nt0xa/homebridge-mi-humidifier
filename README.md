@@ -1,21 +1,24 @@
 # homebridge-mi-humidifier
 
 [![version](https://img.shields.io/npm/v/homebridge-mi-humidifier.svg)](https://www.npmjs.com/package/homebridge-mi-humidifier)
-![downloads](https://img.shields.io/npm/dt/homebridge-mi-humidifier.svg)
+[![downloads](https://img.shields.io/npm/dt/homebridge-mi-humidifier.svg)](https://www.npmjs.com/package/homebridge-mi-humidifier)
+[![donate](https://img.shields.io/badge/donate-buymeacoffee-%23FFDD04)](https://www.buymeacoffee.com/russtone)
 
 A Xiaomi Mi humidifier plugin for Homebridge.
 
-### Example config
+⚠️ The config format was changed in version 2. See the [configuration](#Configuration) section for more details.
+
+## Installation
+
+```
+npm install -g homebridge-mi-humidifier
+```
+
+## Configuration
+
+Add the following part to the "platforms" section of your [Homebridge config](https://github.com/homebridge/homebridge/wiki/Homebridge-Config-JSON-Explained):
 
 ```json
-{
-  "bridge": {
-    "name": "HomebridgeTest",
-    "username": "11:22:33:44:55:66",
-    "port": 51826,
-    "pin": "123-45-678"
-  },
-  "platforms": [
     {
       "platform": "MiHumidifier",
       "devices": [
@@ -25,6 +28,7 @@ A Xiaomi Mi humidifier plugin for Homebridge.
           "token": "<token>",
           "model": "zhimi.humidifier.v1",
           "updateInterval": 30,
+          "disabled": false,
           "ledBulb": {
             "enabled": true,
             "name": "Humidifier LED"
@@ -41,25 +45,86 @@ A Xiaomi Mi humidifier plugin for Homebridge.
             "enabled": true,
             "name": "Humidifier Humidity"
           }
-        }
-      ]
     }
   ]
 }
 ```
 
+### Platform
 
-### Humidifier configuration
+| Key      | Description                                 |
+| -------- | ------------------------------------------- |
+| platform | Platform name. Has to be `MiHumidifier`     |
+| devices  | Array of [devices configurations](#device). |
 
-- `address` – device IP address;
-- `token` – device token (32 hex chars);
-- `model` – the model of a humidifier, one of "zhimi.humidifier.v1", "zhimi.humidifier.ca1", "zhimi.humidifier.cb1", "zhimi.humidifier.ca4", "deerma.humidifier.mjjsq", "deerma.humidifier.jsq4", "shuii.humidifier.jsq001". Default is "zhimi.humidifier.v1";
-- `name` – device name. Default is "Humidifier";
-- `ledBulb.enabled` — if `true`, the led backlight bulb will be added. Default is `false`;
-- `ledBulb.name` — led backlight bulb name. Default is "Humidity LED";
-- `buzzerSwitch.enabled` — if `true`, the buzzer switch will be added. Default is `false`;
-- `buzzerSwitch.name` — buzzer switch name. Default is "Humidifier Buzzer";
-- `temperatureSensor.enabled` — if `true`, the temperature sensor will be added. Default is `false`;
-- `temperatureSensor.name` — temperature sensor name. Default is "Humidifier Temperature";
-- `humiditySensor.enabled` — if `true`, the humidity sensor will be added. Default is `false`;
-- `humiditySensor.name` — humidity sensor name. Default is "Humidifier Humidity";
+### Device
+
+| Key                       | Description                                                  | Default value            |
+| ------------------------- | ------------------------------------------------------------ | ------------------------ |
+| name                      | Name of the device. This will appear in your Home app.       | "Humidifier"             |
+| address                   | IP address of the device.                                    | —                        |
+| token                     | Device token. See [obtaining token](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). | —                        |
+| model                     | One of:<br />- `zhimi.humidifier.v1`<br />- `zhimi.humidifier.ca1`<br />- `zhimi.humidifier.cb1`<br />- `zhimi.humidifier.ca4`<br />- `deerma.humidifier.mjjsq`<br />- `deerma.humidifier.jsq001`<br />- `deerma.humidifier.jsq1`<br />- `shuii.humidifier.jsq001`<br />See [supported devices](#supported-devices) section for more details. | —                        |
+| updateInterval            | Device values update interval in seconds. This value affects how often data (humidity, temperature, etc.) from the device is updated. | 30                       |
+| disabled | Disable the devices. Can be used to temporary hide the device when it is not required without removing it from config. | false |
+| ledBulb.enabled           | Enables additional light bulb accessory which allows to control LED lights. | false                    |
+| ledBulb.name              | Name of LED lightbulb. This will appear in your Home app.    | "Humidifier LED"         |
+| buzzerSwitch.enabled      | Enables additional switch accessory which allows to control buzzer. | false                    |
+| buzzerSwitch.name         | Name of buzzer switch. This will appear in your Home app.    | "Humidifier Buzzer"      |
+| temperatureSensor.enabled | Enables additional temperature sensor accessory.             | false                    |
+| temperatureSensor.name    | Name of temperature sensor. This will appear in your Home app. | "Humidifier Temperature" |
+| humiditySensor.enabled    | Enables additional humidity sensor accessory.                | false                    |
+| humiditySensor.name       | Name of humidity sensor. This will appear in your Home app.  | "Humidifier Humidity"    |
+
+
+
+## Supported devices
+
+### Smartmi Humidifier 
+
+Model: `zhimi.humidifier.v1`
+
+Model №: CJJSQ01ZM
+
+<img src="./.github/assets/zhimi-humidifier-v1.png" width="300px" />
+
+### Smartmi Evaporative Humidifier
+
+Model: `zhimi.humidifier.ca1` / `zhimi.humidifier.cb1`
+
+Model №: CJXJSQ02ZM, SKV6001EU
+
+<img src="./.github/assets/zhimi-humidifier-cab1.png" width="300px" />
+
+### Smartmi Evaporative Humidifier 2
+
+Model: `zhimi.humidifier.ca4`
+
+Model №: CJXJSQ04ZM
+
+<img src="./.github/assets/zhimi-humidifier-ca4.png" width="300px" />
+
+### Zero Fog Humidifier
+
+Model: `shuii.humidifier.jsq001`
+
+Model №: DWZF(G)-2100Z
+
+<img src="./.github/assets/shuii-humidifier-jsq001.jpg" width="400px" />
+
+### Mijia Smart Sterilization Humidifier (S)
+
+Model: `deerma.humidifier.mjjsq` / `deerma.humidifier.jsq001`
+
+Model №: SCK0A45, ZNJSQ01DEM, MJJSQ03DY
+
+<img src="./.github/assets/deerma-humidifier-mjjsq.png" width="350px" />
+
+### Mijia Pure Smart Humidifier
+
+Model: `deerma.humidifier.jsq4`
+
+Model №: CJSJSQ01DY
+
+<img src="./.github/assets/deerma-humidifier-jsq4.jpg" width="300px" />
+
