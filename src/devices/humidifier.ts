@@ -1,6 +1,7 @@
 import type * as hb from "homebridge";
 import type * as hap from "hap-nodejs";
 
+import * as miio from "miio-api";
 import { PlatformAccessory } from "../platform";
 import { Humidifier } from "./factory";
 import { AnyCharacteristicConfig } from "./features";
@@ -88,6 +89,11 @@ export class BaseHumidifier<PropsType extends BasePropsType>
       this.log.error(
         `Fail to get device properties. ${err.constructor.name}: ${err.message}`,
       );
+      if (err instanceof miio.ProtocolError) {
+        this.log.warn(
+          "Got ProtocolError which indicates use of an invalid token. Please, check that provided token is correct!",
+        );
+      }
     }
   }
 
