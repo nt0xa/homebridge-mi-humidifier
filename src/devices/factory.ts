@@ -20,17 +20,6 @@ export type DeviceInfo = {
   hw_ver: string;
 };
 
-const discover = async (address: string, token: string): Promise<Device> => {
-  try {
-    return await miio.device({
-      address: address,
-      token: token,
-    });
-  } catch (err) {
-    throw new HumidifierError(`Fail to connect to device ${address}`, err);
-  }
-};
-
 const getInfo = async (device: Device): Promise<DeviceInfo> => {
   try {
     return await device.call<[], DeviceInfo>("miIO.info");
@@ -50,7 +39,10 @@ export async function createHumidifier(
   api: hb.API,
   log: hb.Logging,
 ): Promise<Humidifier> {
-  const device = await discover(address, token);
+  const device = await miio.device({
+    address: address,
+    token: token,
+  });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let configFunc: HumidifierConfigFunc<any>;

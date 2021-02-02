@@ -1,4 +1,5 @@
-import * as hb from "homebridge";
+import type * as hb from "homebridge";
+import miio from "miio-api";
 import { Humidifier, HumidifierModel, createHumidifier } from "./devices";
 import { validateConfig } from "./validation";
 
@@ -84,6 +85,13 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
         this.log.error(
           `Fail to initialize humidifier. ${err.constructor.name}: ${err.message}`,
         );
+
+        if (err instanceof miio.SocketError) {
+          this.log.warn(
+            "Got SocketError which indicates use of an invalid IP. Please, check that provided IP is correct!",
+          );
+        }
+
         return;
       }
 
