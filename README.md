@@ -1,5 +1,6 @@
 # homebridge-mi-humidifier
 
+[![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 [![version](https://img.shields.io/npm/v/homebridge-mi-humidifier.svg)](https://www.npmjs.com/package/homebridge-mi-humidifier)
 [![downloads](https://img.shields.io/npm/dt/homebridge-mi-humidifier.svg)](https://www.npmjs.com/package/homebridge-mi-humidifier)
 [![donate](https://img.shields.io/badge/donate-buymeacoffee-%23FFDD04)](https://www.buymeacoffee.com/russtone)
