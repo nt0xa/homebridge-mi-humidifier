@@ -74,11 +74,11 @@ export function deermaJSQ4(
       feat.humidityThreshold("target_humidity", "set_properties", {
         min: 40,
         max: 70,
-        switchToMode: {
+        switchToMode: options.autoSwitchToHumidityMode ? {
           key: "fan_level",
           call: "set_properties",
           value: Mode.Humidity,
-        },
+        } : undefined,
       }),
       feat.waterLevel("water_level", {
         toChar: (it) => it == 0 ? 80 : 0,

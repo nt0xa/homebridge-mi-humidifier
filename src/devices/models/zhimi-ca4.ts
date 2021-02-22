@@ -87,11 +87,11 @@ export function zhimiCA4(
       feat.humidityThreshold("target_humidity", "set_properties", {
         min: 30,
         max: 80,
-        switchToMode: {
+        switchToMode: options.autoSwitchToHumidityMode ? {
           key: "mode",
           call: "set_properties",
           value: Mode.Auto
-        },
+        } : undefined,
       }),
       feat.waterLevel("water_level", {
         toChar: (it) => it / 1.2,
