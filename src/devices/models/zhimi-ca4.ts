@@ -84,17 +84,6 @@ export function zhimiCA4(
       feat.rotationSpeed("mode", "set_properties", {
         modes: [Mode.Low, Mode.Medium, Mode.High, Mode.Auto],
       }),
-      feat.humidityThreshold("target_humidity", "set_properties", {
-        min: 30,
-        max: 80,
-        switchToMode: options.autoSwitchToHumidityMode
-          ? {
-              key: "mode",
-              call: "set_properties",
-              value: Mode.Auto,
-            }
-          : undefined,
-      }),
       feat.waterLevel("water_level", {
         toChar: (it) => it / 1.2,
       }),
@@ -104,6 +93,22 @@ export function zhimiCA4(
         on: true,
         off: false,
       }),
+
+      ...(!options.disableTargetHumidity
+        ? [
+            feat.humidityThreshold("target_humidity", "set_properties", {
+              min: 30,
+              max: 80,
+              switchToMode: options.autoSwitchToHumidityMode
+                ? {
+                    key: "mode",
+                    call: "set_properties",
+                    value: Mode.Auto,
+                  }
+                : undefined,
+            }),
+          ]
+        : []),
 
       ...(options.ledBulb?.enabled
         ? feat.ledBulb("led_brightness", "set_properties", {

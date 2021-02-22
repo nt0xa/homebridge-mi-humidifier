@@ -70,6 +70,7 @@ Add the following part to the "platforms" section of your [Homebridge config](ht
 | updateInterval            | Device values update interval in seconds. This value affects how often data (humidity, temperature, etc.) from the device is updated. | 30                       |
 | disabled                  | Disable the devices. Can be used to temporary hide the device when it is not required without removing it from config. | false |
 | autoSwitchToHumidityMode  | Automatically switches mode to "humidity" when target humidity is changed. Affects models: <br /> - `zhimi.humidifier.{ca1,cb1,ca4}`<br /> - `deerma.humidifier.{mjjsq,jsq1,jsq001,jsq4}` | false |
+| disableTargetHumidity     | Disables ability to control target humidity. In this case long press on device in Home.app will allow to control fan speed instead of target humidity. | false |
 | ledBulb.enabled           | Enables additional light bulb accessory which allows to control LED lights. | false                    |
 | ledBulb.name              | Name of LED lightbulb. This will appear in your Home app.    | "Humidifier LED"         |
 | buzzerSwitch.enabled      | Enables additional switch accessory which allows to control buzzer. | false                    |

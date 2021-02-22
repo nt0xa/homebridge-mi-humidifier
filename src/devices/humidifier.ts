@@ -59,10 +59,23 @@ export class BaseHumidifier<PropsType extends BasePropsType>
       this.features.map((feature) => feature.service.UUID),
     );
 
+    // Cleanup disabled services and characteristics.
     accessory.services.forEach((service) => {
       if (!enabledServices.has(service.getServiceId())) {
         accessory.removeService(service);
       }
+
+      const enabledCharacteristics = new Set(
+        this.features
+          .filter((it) => it.service.UUID === service.getServiceId())
+          .map((it) => it.characteristic.UUID),
+      );
+
+      service.characteristics.forEach((char) => {
+        if (!enabledCharacteristics.has(char.UUID)) {
+          service.removeCharacteristic(char);
+        }
+      });
     });
   }
 
