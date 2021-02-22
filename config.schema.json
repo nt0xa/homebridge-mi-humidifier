@@ -44,9 +44,14 @@
             "default": "zhimi.humidifier.v1"
           },
           "updateInterval": {
-            "title": "Parameters update interaval",
+            "title": "Parameters update interval",
             "type": "number",
             "default": 30
+          },
+          "autoSwitchToHumidityMode": {
+            "title": "Automatically switches mode to \"humidity\" when target humidity is changed.",
+            "type": "boolean",
+            "default": false
           },
           "disableTargetHumidity": {
             "title": "Disables ability to control target humidity. In this case long press on device in Home.app will allow to control fan speed instead of target humidity.",
