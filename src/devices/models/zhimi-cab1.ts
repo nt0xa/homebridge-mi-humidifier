@@ -41,17 +41,6 @@ function common<PropsType extends Props>(
   return [
     ...zhimiCommon<PropsType>(feat, options),
 
-    feat.humidityThreshold("limit_hum", "set_limit_hum", {
-      min: 30,
-      max: 80,
-      switchToMode: options.autoSwitchToHumidityMode
-        ? {
-            key: "mode",
-            call: "set_mode",
-            value: Mode.Auto,
-          }
-        : undefined,
-    }),
     feat.rotationSpeed("mode", "set_mode", {
       modes: [Mode.Silent, Mode.Medium, Mode.High, Mode.Auto],
     }),
@@ -59,6 +48,22 @@ function common<PropsType extends Props>(
       toChar: (it) => it / 1.2,
     }),
     feat.swingMode("dry", "set_dry", { on: "on", off: "off" }),
+
+    ...(!options.disableTargetHumidity
+      ? [
+          feat.humidityThreshold("limit_hum", "set_limit_hum", {
+            min: 30,
+            max: 80,
+            switchToMode: options.autoSwitchToHumidityMode
+              ? {
+                  key: "mode",
+                  call: "set_mode",
+                  value: Mode.Auto,
+                }
+              : undefined,
+          }),
+        ]
+      : []),
   ];
 }
 

@@ -211,7 +211,10 @@ export function features<PropsType extends BasePropsType>(
         service: Service.HumidifierDehumidifier,
         characteristic: Characteristic.RotationSpeed,
         props: {
-          minValue: 1,
+          // Home.app automatically sends power off command when
+          // rotation speed is set to 0, so to be able to set lowest speed
+          // we need to start from 1.
+          minValue: 0,
           maxValue: params.modes.length,
         },
         key: key,

@@ -29,13 +29,18 @@ export function zhimiV1(
     features: [
       ...zhimiCommon<Props>(feat, options),
 
-      feat.humidityThreshold("limit_hum", "set_limit_hum", {
-        min: 30,
-        max: 80,
-      }),
       feat.rotationSpeed("mode", "set_mode", {
         modes: [Mode.Silent, Mode.Medium, Mode.High],
       }),
+
+      ...(!options.disableTargetHumidity
+        ? [
+            feat.humidityThreshold("limit_hum", "set_limit_hum", {
+              min: 30,
+              max: 80,
+            }),
+          ]
+        : []),
 
       ...(options.temperatureSensor?.enabled
         ? feat.temperatureSensor("temp_dec", {

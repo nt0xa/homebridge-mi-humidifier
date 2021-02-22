@@ -71,17 +71,6 @@ export function deermaJSQ4(
       feat.rotationSpeed("fan_level", "set_properties", {
         modes: [Mode.Level1, Mode.Level2, Mode.Humidity],
       }),
-      feat.humidityThreshold("target_humidity", "set_properties", {
-        min: 40,
-        max: 70,
-        switchToMode: options.autoSwitchToHumidityMode
-          ? {
-              key: "fan_level",
-              call: "set_properties",
-              value: Mode.Humidity,
-            }
-          : undefined,
-      }),
       feat.waterLevel("water_level", {
         toChar: (it) => (it == 0 ? 80 : 0),
       }),
@@ -93,6 +82,22 @@ export function deermaJSQ4(
             on: true,
             off: false,
           })
+        : []),
+
+      ...(!options.disableTargetHumidity
+        ? [
+            feat.humidityThreshold("target_humidity", "set_properties", {
+              min: 40,
+              max: 70,
+              switchToMode: options.autoSwitchToHumidityMode
+                ? {
+                    key: "fan_level",
+                    call: "set_properties",
+                    value: Mode.Humidity,
+                  }
+                : undefined,
+            }),
+          ]
         : []),
 
       ...(options.buzzerSwitch?.enabled

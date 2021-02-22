@@ -57,18 +57,23 @@ export function deermaMJJSQ(
         modes: [Gear.Low, Gear.Medium, Gear.High, Gear.Humidity],
       }),
       feat.humidity("Humidity_Value"),
-      feat.humidityThreshold("HumiSet_Value", "Set_HumiValue", {
-        min: 40,
-        max: 70,
-        switchToMode: options.autoSwitchToHumidityMode
-          ? {
-              key: "Humidifier_Gear",
-              call: "Set_HumidifierGears",
-              value: Gear.Humidity,
-            }
-          : undefined,
-      }),
       feat.waterLevel("waterstatus", { toChar: (it) => it * 100 }),
+
+      ...(!options.disableTargetHumidity
+        ? [
+            feat.humidityThreshold("HumiSet_Value", "Set_HumiValue", {
+              min: 40,
+              max: 70,
+              switchToMode: options.autoSwitchToHumidityMode
+                ? {
+                    key: "Humidifier_Gear",
+                    call: "Set_HumidifierGears",
+                    value: Gear.Humidity,
+                  }
+                : undefined,
+            }),
+          ]
+        : []),
 
       ...(options.ledBulb?.enabled
         ? feat.ledBulb("Led_State", "SetLedState", {
