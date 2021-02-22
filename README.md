@@ -30,6 +30,7 @@ Add the following part to the "platforms" section of your [Homebridge config](ht
       "model": "zhimi.humidifier.v1",
       "updateInterval": 30,
       "disabled": false,
+      "autoSwitchToHumidityMode": true,
       "ledBulb": {
         "enabled": true,
         "name": "Humidifier LED"
@@ -67,7 +68,8 @@ Add the following part to the "platforms" section of your [Homebridge config](ht
 | token                     | Device token. See [obtaining token](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). | —                        |
 | model                     | One of:<br />- `zhimi.humidifier.v1`<br />- `zhimi.humidifier.ca1`<br />- `zhimi.humidifier.cb1`<br />- `zhimi.humidifier.ca4`<br />- `deerma.humidifier.mjjsq`<br />- `deerma.humidifier.jsq001`<br />- `deerma.humidifier.jsq1`<br />- `shuii.humidifier.jsq001`<br />See [supported devices](#supported-devices) section for more details. | —                        |
 | updateInterval            | Device values update interval in seconds. This value affects how often data (humidity, temperature, etc.) from the device is updated. | 30                       |
-| disabled | Disable the devices. Can be used to temporary hide the device when it is not required without removing it from config. | false |
+| disabled                  | Disable the devices. Can be used to temporary hide the device when it is not required without removing it from config. | false |
+| autoSwitchToHumidityMode  | Automatically switches mode to "humidity" when target humidity is changed. Affects models: <br /> - `zhimi.humidifier.{ca1,cb1,ca4}`<br /> - `deerma.humidifier.{mjjsq,jsq1,jsq001,jsq4}` | false |
 | ledBulb.enabled           | Enables additional light bulb accessory which allows to control LED lights. | false                    |
 | ledBulb.name              | Name of LED lightbulb. This will appear in your Home app.    | "Humidifier LED"         |
 | buzzerSwitch.enabled      | Enables additional switch accessory which allows to control buzzer. | false                    |

@@ -20,6 +20,7 @@ type Props = CommonProps & {
   dry: "on" | "off";
   temperature: number; // cb1
   temp_dec: number; // ca1
+  limit_hum: number;
 };
 
 class Proto extends MiioProtocol<Props> {
@@ -40,6 +41,15 @@ function common<PropsType extends Props>(
   return [
     ...zhimiCommon<PropsType>(feat, options),
 
+    feat.humidityThreshold("limit_hum", "set_limit_hum", {
+      min: 30,
+      max: 80,
+      switchToMode: options.autoSwitchToHumidityMode ? {
+        key: "mode",
+        call: "set_mode",
+        value: Mode.Auto
+      } : undefined,
+    }),
     feat.rotationSpeed("mode", "set_mode", {
       modes: [Mode.Silent, Mode.Medium, Mode.High, Mode.Auto],
     }),
