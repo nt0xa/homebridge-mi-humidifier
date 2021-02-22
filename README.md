@@ -31,6 +31,7 @@ Add the following part to the "platforms" section of your [Homebridge config](ht
       "updateInterval": 30,
       "disabled": false,
       "autoSwitchToHumidityMode": true,
+      "disableTargetHumidity": false,
       "ledBulb": {
         "enabled": true,
         "name": "Humidifier LED"
