@@ -270,8 +270,8 @@ export function features<PropsType extends BasePropsType>(
             }
           },
           afterSet: ({ characteristic, mappedValue }) => {
-            // Update characteristic immediatly not immediately so
-            // udpating it after a small delay.
+            // Update characteristic immediately is not working, so
+            // update it after a small delay.
             setTimeout(() => {
               characteristic.updateValue(mappedValue);
             }, 200);
@@ -432,7 +432,7 @@ export function features<PropsType extends BasePropsType>(
         {
           service: Service.TemperatureSensor,
           characteristic: Characteristic.Name,
-          value: params.name || "Humidifier Termperature",
+          value: params.name || "Humidifier Temperature",
         },
         {
           service: Service.TemperatureSensor,

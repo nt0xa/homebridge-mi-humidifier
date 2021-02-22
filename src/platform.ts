@@ -44,7 +44,8 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
     }
 
     // Register new accessories.
-    this.config.devices.forEach(async (config, index) => {
+    for (const config of this.config.devices) {
+      const index = this.config.devices.indexOf(config);
       // Skip disabled devices.
       if (config.disabled) {
         // Unregister accessory if exists.
@@ -54,7 +55,7 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
             accessory,
           ]);
         }
-        return;
+        continue;
       }
 
       // Validate config before creating device.
@@ -64,7 +65,7 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
         this.log.error(
           `Invalid config for device #${index}. ${err.constructor.name}: ${err.message}`,
         );
-        return;
+        continue;
       }
 
       const { name, address, token, model, ...options } = config;
@@ -92,7 +93,7 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
           );
         }
 
-        return;
+        continue;
       }
 
       let accessory: PlatformAccessory;
@@ -129,7 +130,7 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
 
       // Initial update.
       await update();
-    });
+    }
 
     // Unregister unused accessories.
     this.accessories.forEach((accessory, address) => {

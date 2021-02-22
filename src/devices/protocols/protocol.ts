@@ -98,7 +98,7 @@ export abstract class BaseProtocol<
   ): SetArgType;
 
   /**
-   * Sest device prop.
+   * Sets device prop.
    *
    * @param prop prop of device to set.
    * @param call name of `setProp` device call for the prop.
@@ -126,7 +126,7 @@ export abstract class BaseProtocol<
    * If called multiple times simultaneously does request only once and returns
    * the same promise for all callers.
    *
-   * @param array of requested device properties.
+   * @param props array of requested device properties.
    * @return `PropsType` object containing all requested props values.
    */
   async getProps(props: Array<keyof PropsType>): Promise<PropsType> {

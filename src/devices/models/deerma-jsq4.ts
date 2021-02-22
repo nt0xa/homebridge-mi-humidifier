@@ -9,7 +9,7 @@ import { HumidifierConfig } from ".";
 enum Mode {
   Level1 = 1,
   Level2 = 2,
-  Humidity = 3
+  Humidity = 3,
 }
 
 type Props = {
@@ -74,14 +74,16 @@ export function deermaJSQ4(
       feat.humidityThreshold("target_humidity", "set_properties", {
         min: 40,
         max: 70,
-        switchToMode: options.autoSwitchToHumidityMode ? {
-          key: "fan_level",
-          call: "set_properties",
-          value: Mode.Humidity,
-        } : undefined,
+        switchToMode: options.autoSwitchToHumidityMode
+          ? {
+              key: "fan_level",
+              call: "set_properties",
+              value: Mode.Humidity,
+            }
+          : undefined,
       }),
       feat.waterLevel("water_level", {
-        toChar: (it) => it == 0 ? 80 : 0,
+        toChar: (it) => (it == 0 ? 80 : 0),
       }),
       feat.humidity("relative_humidity"),
       ...(options.ledBulb?.enabled

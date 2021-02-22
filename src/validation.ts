@@ -19,11 +19,11 @@ function isValidModel(model: HumidifierModel): boolean {
 
 export function validateConfig(config: DeviceConfig): void {
   if (!config.address || !isValidIP(config.address)) {
-    throw new ValidationError(`Ivalid IP address "${config.address}"`);
+    throw new ValidationError(`Invalid IP address "${config.address}"`);
   }
 
   if (!config.token || !isValidToken(config.token)) {
-    throw new ValidationError(`Ivalid device token "${config.token}"`);
+    throw new ValidationError(`Invalid device token "${config.token}"`);
   }
 
   if (!config.model || !isValidModel(config.model)) {
