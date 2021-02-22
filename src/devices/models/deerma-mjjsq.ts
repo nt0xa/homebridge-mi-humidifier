@@ -60,6 +60,11 @@ export function deermaMJJSQ(
       feat.humidityThreshold("HumiSet_Value", "Set_HumiValue", {
         min: 40,
         max: 70,
+        switchToMode: {
+          key: "Humidifier_Gear",
+          call: "Set_HumidifierGears",
+          value: Gear.Humidity,
+        },
       }),
       feat.waterLevel("waterstatus", { toChar: (it) => it * 100 }),
 

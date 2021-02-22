@@ -1,11 +1,6 @@
 import type * as hb from "homebridge";
 import type * as hap from "hap-nodejs";
-import {
-  BasePropsType,
-  CharacteristicConfig,
-  BeforeSetFunc,
-  GetMapFunc,
-} from "./humidifier";
+import { BasePropsType, CharacteristicConfig, GetMapFunc } from "./humidifier";
 import { ValueOf } from "./utils";
 import { HumidifierModel } from "./models";
 
@@ -52,12 +47,22 @@ export interface Features<PropsType extends BasePropsType> {
     key: PropKey,
   ): AnyCharacteristicConfig<PropsType>;
 
-  humidityThreshold<PropKey extends keyof PropsType>(
+  humidityThreshold<
+    PropKey extends keyof PropsType,
+    ModePropKey extends keyof PropsType
+  >(
     key: PropKey,
     setCall: string,
     params: {
       min: number;
       max: number;
+      // Some humidifiers have special mode for reaching target humidity.
+      // Pass "key" and "value" for this mode to enable it automatically.
+      switchToMode?: {
+        key: ModePropKey;
+        call: string;
+        value: PropsType[ModePropKey];
+      };
     },
   ): AnyCharacteristicConfig<PropsType>;
 
@@ -257,6 +262,12 @@ export function features<PropsType extends BasePropsType>(
             }
 
             return it as PropsType[typeof key];
+          },
+          beforeSet: async ({ protocol }) => {
+            if (params.switchToMode) {
+              const { key, call, value } = params.switchToMode;
+              await protocol.setProp(key, call, value);
+            }
           },
           afterSet: ({ characteristic, mappedValue }) => {
             // Update characteristic immediatly not immediately so

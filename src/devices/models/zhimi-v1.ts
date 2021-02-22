@@ -15,6 +15,7 @@ enum Mode {
 type Props = CommonProps & {
   mode: Mode;
   temp_dec: number;
+  limit_hum: number;
 };
 
 export function zhimiV1(
@@ -28,6 +29,10 @@ export function zhimiV1(
     features: [
       ...zhimiCommon<Props>(feat, options),
 
+      feat.humidityThreshold("limit_hum", "set_limit_hum", {
+        min: 30,
+        max: 80,
+      }),
       feat.rotationSpeed("mode", "set_mode", {
         modes: [Mode.Silent, Mode.Medium, Mode.High],
       }),

@@ -262,7 +262,7 @@ export type SetMapFunc<PropsType> = (
  */
 export type BeforeSetFunc<PropsType> = (
   args: BeforeSetFuncArgs<PropsType>,
-) => boolean | Promise<boolean> | undefined;
+) => boolean | Promise<boolean> | void | Promise<void>;
 
 export type BeforeSetFuncArgs<PropsType> = {
   value: hb.CharacteristicValue;

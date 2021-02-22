@@ -10,7 +10,6 @@ enum LedState {
 export type CommonProps = {
   power: "on" | "off";
   humidity: number;
-  limit_hum: number; // 30-80
   child_lock: "on" | "off";
   led_b: LedState;
   buzzer: "on" | "off";
@@ -24,7 +23,6 @@ export function zhimiCommon<PropsType extends CommonProps>(
     feat.targetState(),
     feat.currentState("power", { on: "on", off: "off" }),
     feat.active("power", "set_power", { on: "on", off: "off" }),
-    feat.humidityThreshold("limit_hum", "set_limit_hum", { min: 30, max: 80 }),
     feat.lockPhysicalControls("child_lock", "set_child_lock", {
       on: "on",
       off: "off",
