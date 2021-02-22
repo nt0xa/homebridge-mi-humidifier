@@ -5,7 +5,7 @@ import * as miio from "miio-api";
 import { PlatformAccessory } from "../platform";
 import { Humidifier } from "./factory";
 import { AnyCharacteristicConfig } from "./features";
-import { Protocol } from "./protocols/protocol";
+import { Protocol } from "./protocols";
 import { ValueOf } from "./utils";
 import { Logger } from "./logger";
 
@@ -26,16 +26,17 @@ export class BaseHumidifier<PropsType extends BasePropsType>
   private cache: PropsType;
 
   /**
-   * @param device miio.Device returned by miio.discover function.
-   * @param log homebridge logger.
+   * @param protocol device protocol.
+   * @param features device characteristics configurations.
+   * @param log logger.
    */
   constructor(
     protocol: Protocol<PropsType>,
-    featues: Array<AnyCharacteristicConfig<PropsType>>,
+    features: Array<AnyCharacteristicConfig<PropsType>>,
     log: Logger,
   ) {
     this.protocol = protocol;
-    this.features = featues;
+    this.features = features;
     this.log = log;
 
     this.props = [];
@@ -45,7 +46,7 @@ export class BaseHumidifier<PropsType extends BasePropsType>
   /**
    * Adds services and characteristics to the accessory.
    * This method should be overwritten in child classes to add
-   * all nesessary services and characteristics.
+   * all necessary services and characteristics.
    *
    * @param accessory homebridge accessory
    */
@@ -164,7 +165,7 @@ export class BaseHumidifier<PropsType extends BasePropsType>
    * Function which is used as homebridge `CharacteristicGetCallback` for
    * all registered characteristics.
    *
-   * Returns last cahed property value. This method don't make
+   * Returns last cached property value. This method don't make
    * device call because some devices are slow to respond and if we
    * will request every prop from device here HomeKit will become unresponsive.
    *
