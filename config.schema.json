@@ -48,6 +48,11 @@
             "type": "number",
             "default": 30
           },
+          "disableTargetHumidity": {
+            "title": "Disables ability to control target humidity. In this case long press on device in Home.app will allow to control fan speed instead of target humidity.",
+            "type": "boolean",
+            "default": false
+          },
           "temperatureSensor": {
             "title": "Temperature sensor",
             "type": "object",

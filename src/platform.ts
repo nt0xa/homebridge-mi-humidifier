@@ -189,7 +189,7 @@ export type DeviceOptions = {
     name?: string;
   };
   autoSwitchToHumidityMode?: boolean;
-  disableTargetHumidity?: Boolean;
+  disableTargetHumidity?: boolean;
 };
 
 /**
