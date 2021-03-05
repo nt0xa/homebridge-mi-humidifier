@@ -129,8 +129,13 @@ export class BaseHumidifier<PropsType extends BasePropsType>
     }
 
     if ("value" in config) {
-      // Static characteristic.
-      characteristic.setValue(config.value);
+      if (typeof config.value === "function") {
+        // Callback.
+        characteristic.on("get", config.value);
+      } else {
+        // Static value.
+        characteristic.setValue(config.value);
+      }
     } else {
       // Dynamic characteristic.
       const getEntry: GetEntry<PropsType> = {
@@ -362,7 +367,9 @@ export type CharacteristicConfigStatic = {
   // HomeKit characteristic properties if required.
   props?: Partial<hb.CharacteristicProps>;
   // HomeKit characteristic value.
-  value: hb.CharacteristicValue;
+  value:
+    | hb.CharacteristicValue
+    | ((callback: hb.CharacteristicGetCallback) => void);
 };
 
 export type CharacteristicConfigDynamic<PropsType, PropKey, PropValue> = {

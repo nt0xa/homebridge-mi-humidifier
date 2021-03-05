@@ -12,6 +12,7 @@ export type AnyCharacteristicConfig<PropsType> = CharacteristicConfig<
 
 export interface Features<PropsType extends BasePropsType> {
   accessoryInfo(
+    name: string,
     model: HumidifierModel,
     deviceId: number,
   ): Array<AnyCharacteristicConfig<PropsType>>;
@@ -134,8 +135,13 @@ export function features<PropsType extends BasePropsType>(
   log: hb.Logging,
 ): Features<PropsType> {
   return {
-    accessoryInfo(model, deviceId) {
+    accessoryInfo(name, model, deviceId) {
       return [
+        {
+          service: Service.AccessoryInformation,
+          characteristic: Characteristic.Name,
+          value: name,
+        },
         {
           service: Service.AccessoryInformation,
           characteristic: Characteristic.Manufacturer,
@@ -150,6 +156,14 @@ export function features<PropsType extends BasePropsType>(
           service: Service.AccessoryInformation,
           characteristic: Characteristic.SerialNumber,
           value: `${deviceId}`,
+        },
+        {
+          service: Service.AccessoryInformation,
+          characteristic: Characteristic.Identify,
+          value: (callback: hb.CharacteristicGetCallback) => {
+            log.info(`Identified device "${name}"`);
+            callback(null);
+          },
         },
       ];
     },
