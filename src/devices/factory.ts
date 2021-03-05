@@ -32,6 +32,7 @@ const getInfo = async (device: Device): Promise<DeviceInfo> => {
 };
 
 export async function createHumidifier(
+  name: string,
   address: string,
   token: string,
   model: HumidifierModel,
@@ -60,7 +61,7 @@ export async function createHumidifier(
 
   return new BaseHumidifier(
     protocol,
-    [...feat.accessoryInfo(model, device.id), ...feats],
+    [...feat.accessoryInfo(name, model, device.id), ...feats],
     new Logger(log, `[${address}] `),
   );
 }

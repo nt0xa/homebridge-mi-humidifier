@@ -70,11 +70,14 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
 
       const { name, address, token, model, ...options } = config;
 
+      const displayName = name || "Humidifier";
+
       // Try to create humidifier object for the accessory.
       let humidifier: Humidifier;
 
       try {
         humidifier = await createHumidifier(
+          displayName,
           address,
           token,
           model,
@@ -106,7 +109,7 @@ export class MiHumidifierPlatform implements hb.DynamicPlatformPlugin {
         this.log.info(`Registering new device with IP "${address}".`);
 
         accessory = new this.api.platformAccessory(
-          name || "Humidifier",
+          displayName,
           this.api.hap.uuid.generate(address),
         );
 
