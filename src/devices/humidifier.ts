@@ -97,7 +97,9 @@ export class BaseHumidifier<PropsType extends BasePropsType>
         this.log.debug(
           `Updating property "${prop.key}": ${propValue} -> ${charValue}`,
         );
-        prop.characteristic.updateValue(charValue);
+        prop.characteristics.forEach((char) => {
+          char.updateValue(charValue);
+        });
       });
     } catch (err) {
       this.log.error(
@@ -140,13 +142,19 @@ export class BaseHumidifier<PropsType extends BasePropsType>
       // Dynamic characteristic.
       const getEntry: GetEntry<PropsType> = {
         key: config.key,
-        characteristic: characteristic,
+        characteristics: [characteristic],
         map: config.get?.map
           ? (config.get.map as GetMapFunc<PropsType>)
           : (it: PrimitiveType) => it, // by default return the same value.
       };
 
-      if (!this.props.find((prop) => prop.key === config.key)) {
+      const entry = this.props.find((prop) => prop.key === config.key);
+
+      if (entry) {
+        // If prop entry is already saved, just add new characteristic to it.
+        entry.characteristics.push(characteristic);
+      } else {
+        // Save prop entry.
         this.props.push(getEntry);
       }
 
@@ -312,8 +320,8 @@ export type GetEntry<PropsType> = {
   // Property identifier.
   key: keyof PropsType;
 
-  // Accessory characteristic that must be updated with device property value.
-  characteristic: hb.Characteristic;
+  // Accessories characteristics that must be updated with device property value.
+  characteristics: Array<hb.Characteristic>;
 
   // Function that converts device property to corresponding characteristic value.
   map: (it: ValueOf<PropsType>) => hb.CharacteristicValue;
