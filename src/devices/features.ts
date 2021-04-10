@@ -324,7 +324,10 @@ export function features<PropsType extends BasePropsType>(
         characteristic: Characteristic.WaterLevel,
         key: key,
         get: {
-          map: params.toChar as GetMapFunc<PropsType>,
+          // Some humidifier models return special values for water level
+          // when water tank is detached, so we limit the value here.
+          map: (it) =>
+            Math.min(params.toChar(it as PropsType[typeof key]) as number, 100),
         },
       };
     },

@@ -85,8 +85,7 @@ export function zhimiCA4(
         modes: [Mode.Low, Mode.Medium, Mode.High, Mode.Auto],
       }),
       feat.waterLevel("water_level", {
-        // Water level can be more then 120 when water tank is detached.
-        toChar: (it) => Math.min(it / 1.2, 100),
+        toChar: (it) => it / 1.2,
       }),
       feat.swingMode("dry", "set_properties", { on: true, off: false }),
       feat.humidity("humidity"),
