@@ -191,6 +191,10 @@ export type DeviceOptions = {
     enabled: boolean;
     name?: string;
   };
+  cleanModeSwitch?: {
+    enabled: boolean;
+    name?: string;
+  };
   autoSwitchToHumidityMode?: boolean;
   disableTargetHumidity?: boolean;
 };

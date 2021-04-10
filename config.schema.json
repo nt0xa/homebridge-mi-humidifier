@@ -125,6 +125,23 @@
                 "minLength": 1
               }
             }
+          },
+          "cleanModeSwitch": {
+            "title": "Clean mode switch (only for zhimi.humidifier.ca4)",
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "title": "Enable clean mode switch",
+                "type": "boolean",
+                "default": false
+              },
+              "name": {
+                "title": "Clean mode switch name",
+                "type": "string",
+                "default": "Clean Mode",
+                "minLength": 1
+              }
+            }
           }
         }
       }

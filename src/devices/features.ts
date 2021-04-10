@@ -127,6 +127,16 @@ export interface Features<PropsType extends BasePropsType> {
       toChar?: (it: PropsType[PropKey]) => hb.CharacteristicValue;
     },
   ): Array<AnyCharacteristicConfig<PropsType>>;
+
+  cleanModeSwitch<PropKey extends keyof PropsType>(
+    key: PropKey,
+    setCall: string,
+    params: {
+      name?: string;
+      on: PropsType[PropKey];
+      off: PropsType[PropKey];
+    },
+  ): Array<AnyCharacteristicConfig<PropsType>>;
 }
 
 export function features<PropsType extends BasePropsType>(
@@ -460,6 +470,29 @@ export function features<PropsType extends BasePropsType>(
           key: key,
           get: {
             map: params.toChar as GetMapFunc<PropsType>,
+          },
+        },
+      ];
+    },
+
+    cleanModeSwitch(key, setCall, params) {
+      return [
+        {
+          service: Service.Switch,
+          characteristic: Characteristic.Name,
+          value: params.name || "Humidifier Clean Mode",
+        },
+
+        {
+          service: Service.Switch,
+          characteristic: Characteristic.On,
+          key: key,
+          get: {
+            map: (it) => it === params.on,
+          },
+          set: {
+            call: setCall,
+            map: (it) => (it ? params.on : params.off),
           },
         },
       ];
