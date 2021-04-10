@@ -80,6 +80,8 @@ Add the following part to the "platforms" section of your [Homebridge config](ht
 | temperatureSensor.name    | Name of temperature sensor. This will appear in your Home app. | "Humidifier Temperature" |
 | humiditySensor.enabled    | Enables additional humidity sensor accessory.                | false                    |
 | humiditySensor.name       | Name of humidity sensor. This will appear in your Home app.  | "Humidifier Humidity"    |
+| cleanModeSwitch.enabled   | Enables additional switch accessory which allows to control clean mode (only for zhimi.humidifier.ca4). | false                    |
+| cleanModeSwitch.name      | Name of clean mode switch. This will appear in your Home app.    | "Humidifier Clean Mode"      |
 
 
 

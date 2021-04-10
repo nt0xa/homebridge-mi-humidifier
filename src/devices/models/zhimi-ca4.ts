@@ -30,6 +30,7 @@ type Props = {
   led_brightness: LedState;
   buzzer: boolean;
   temperature: number;
+  clean_mode: boolean;
 };
 
 class Proto extends MiotProtocol<Props> {
@@ -65,6 +66,8 @@ class Proto extends MiotProtocol<Props> {
         return { ...common, siid: 4, piid: 1 };
       case "temperature":
         return { ...common, siid: 3, piid: 7 };
+      case "clean_mode":
+        return { ...common, siid: 7, piid: 5 };
     }
   }
 }
@@ -137,6 +140,14 @@ export function zhimiCA4(
         ? feat.temperatureSensor("temperature", {
             name: options.temperatureSensor.name,
             toChar: (it) => it,
+          })
+        : []),
+
+      ...(options.cleanModeSwitch?.enabled
+        ? feat.cleanModeSwitch("clean_mode", "set_properties", {
+            name: options.cleanModeSwitch.name,
+            on: true,
+            off: false,
           })
         : []),
     ],
