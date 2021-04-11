@@ -93,12 +93,13 @@ export class BaseHumidifier<PropsType extends BasePropsType>
       );
       this.props.forEach((prop) => {
         const propValue = this.cache[prop.key];
-        const charValue = prop.map(propValue);
-        this.log.debug(
-          `Updating property "${prop.key}": ${propValue} -> ${charValue}`,
-        );
-        prop.characteristics.forEach((char) => {
-          char.updateValue(charValue);
+
+        prop.values.forEach((value) => {
+          const charValue = value.map(propValue);
+          this.log.debug(
+            `Updating property "${prop.key}": ${propValue} -> ${charValue}`,
+          );
+          value.characteristic.updateValue(charValue);
         });
       });
     } catch (err) {
@@ -140,26 +141,33 @@ export class BaseHumidifier<PropsType extends BasePropsType>
       }
     } else {
       // Dynamic characteristic.
-      const getEntry: GetEntry<PropsType> = {
-        key: config.key,
-        characteristics: [characteristic],
-        map: config.get?.map
-          ? (config.get.map as GetMapFunc<PropsType>)
-          : (it: PrimitiveType) => it, // by default return the same value.
-      };
+      const getMap = config.get?.map
+        ? (config.get.map as GetMapFunc<PropsType>)
+        : (it: PrimitiveType) => it; // by default return the same value.
 
       const entry = this.props.find((prop) => prop.key === config.key);
 
       if (entry) {
         // If prop entry is already saved, just add new characteristic to it.
-        entry.characteristics.push(characteristic);
+        entry.values.push({
+          characteristic: characteristic,
+          map: getMap,
+        });
       } else {
         // Save prop entry.
-        this.props.push(getEntry);
+        this.props.push({
+          key: config.key,
+          values: [
+            {
+              characteristic: characteristic,
+              map: getMap,
+            },
+          ],
+        });
       }
 
       characteristic.on("get", (callback: hb.CharacteristicGetCallback) => {
-        this.getProp(getEntry, callback);
+        this.getProp(config.key, getMap, callback);
       });
 
       if (config.set) {
@@ -195,15 +203,17 @@ export class BaseHumidifier<PropsType extends BasePropsType>
    * device call because some devices are slow to respond and if we
    * will request every prop from device here HomeKit will become unresponsive.
    *
-   * @param entry `GetEntry` object for prop.
+   * @param key property identifier.
+   * @param map function that converts property value to characteristic.
    * @param callback characteristic get callback.
    */
   private getProp(
-    entry: GetEntry<PropsType>,
+    key: keyof PropsType,
+    map: (it: ValueOf<PropsType>) => hb.CharacteristicValue,
     callback: hb.CharacteristicGetCallback,
   ): void {
-    this.log.debug(`Getting property "${entry.key}"`);
-    callback(null, entry.map(this.cache[entry.key]));
+    this.log.debug(`Getting property "${key}"`);
+    callback(null, map(this.cache[key]));
   }
 
   /**
@@ -320,11 +330,13 @@ export type GetEntry<PropsType> = {
   // Property identifier.
   key: keyof PropsType;
 
-  // Accessories characteristics that must be updated with device property value.
-  characteristics: Array<hb.Characteristic>;
+  values: Array<{
+    // Accessories characteristics that must be updated with device property value.
+    characteristic: hb.Characteristic;
 
-  // Function that converts device property to corresponding characteristic value.
-  map: (it: ValueOf<PropsType>) => hb.CharacteristicValue;
+    // Function that converts device property to corresponding characteristic value.
+    map: (it: ValueOf<PropsType>) => hb.CharacteristicValue;
+  }>;
 };
 
 /**
