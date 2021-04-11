@@ -56,23 +56,32 @@ export class BaseHumidifier<PropsType extends BasePropsType>
     });
 
     const enabledServices = new Set(
-      this.features.map((feature) => feature.service.UUID),
+      this.features.map(
+        (feature) =>
+          feature.service.UUID + (feature.name ? feature.name.subtype : ""),
+      ),
     );
 
     // Cleanup disabled services and characteristics.
     accessory.services.forEach((service) => {
       if (!enabledServices.has(service.getServiceId())) {
+        this.log.debug("Removing service", service.getServiceId());
         accessory.removeService(service);
       }
 
       const enabledCharacteristics = new Set(
         this.features
-          .filter((it) => it.service.UUID === service.getServiceId())
+          .filter(
+            (it) =>
+              it.service.UUID + (it.name ? it.name.subtype : "") ===
+              service.getServiceId(),
+          )
           .map((it) => it.characteristic.UUID),
       );
 
       service.characteristics.forEach((char) => {
         if (!enabledCharacteristics.has(char.UUID)) {
+          this.log.debug("Removing characteristic", char.UUID);
           service.removeCharacteristic(char);
         }
       });
@@ -121,9 +130,21 @@ export class BaseHumidifier<PropsType extends BasePropsType>
     accessory: PlatformAccessory,
     config: CharacteristicConfig<PropsType, PropsKey, PropsType[PropsKey]>,
   ): void {
-    const service =
-      accessory.getService(config.service) ||
-      accessory.addService(config.service);
+    let service;
+
+    if (config.name) {
+      service =
+        accessory.getService(config.name.displayName) ||
+        accessory.addService(
+          config.service,
+          config.name.displayName,
+          config.name.subtype,
+        );
+    } else {
+      service =
+        accessory.getService(config.service) ||
+        accessory.addService(config.service);
+    }
 
     const characteristic = service.getCharacteristic(config.characteristic);
 
@@ -382,6 +403,13 @@ export type CharacteristicConfig<PropsType, PropKey, PropValue> =
 export type CharacteristicConfigStatic = {
   // HomeKit service.
   service: Service;
+
+  // HomeKit service name (required if we have multiple services of the same type).
+  name?: {
+    displayName: string;
+    subtype: string;
+  };
+
   // HomeKit characteristic.
   characteristic: Characteristic;
   // HomeKit characteristic properties if required.
@@ -395,6 +423,12 @@ export type CharacteristicConfigStatic = {
 export type CharacteristicConfigDynamic<PropsType, PropKey, PropValue> = {
   // HomeKit service.
   service: Service;
+
+  // HomeKit service name (required if we have multiple services of the same type).
+  name?: {
+    displayName: string;
+    subtype: string;
+  };
 
   // HomeKit characteristic.
   characteristic: Characteristic;

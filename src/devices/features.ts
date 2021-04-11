@@ -420,15 +420,24 @@ export function features<PropsType extends BasePropsType>(
     },
 
     buzzerSwitch(key, setCall, params) {
+      const name = params.name || "Humidifier Buzzer";
       return [
         {
           service: Service.Switch,
+          name: {
+            displayName: name,
+            subtype: "buzzer-switch",
+          },
           characteristic: Characteristic.Name,
-          value: params.name || "Humidifier Buzzer",
+          value: name,
         },
 
         {
           service: Service.Switch,
+          name: {
+            displayName: name,
+            subtype: "buzzer-switch",
+          },
           characteristic: Characteristic.On,
           key: key,
           get: {
@@ -476,15 +485,24 @@ export function features<PropsType extends BasePropsType>(
     },
 
     cleanModeSwitch(key, setCall, params) {
+      const name = params.name || "Humidifier Clean Mode";
       return [
         {
           service: Service.Switch,
+          name: {
+            displayName: name,
+            subtype: "clean-mode-switch",
+          },
           characteristic: Characteristic.Name,
-          value: params.name || "Humidifier Clean Mode",
+          value: name,
         },
 
         {
           service: Service.Switch,
+          name: {
+            displayName: name,
+            subtype: "clean-mode-switch",
+          },
           characteristic: Characteristic.On,
           key: key,
           get: {
