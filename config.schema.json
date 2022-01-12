@@ -38,7 +38,10 @@
               "zhimi.humidifier.cb1",
               "zhimi.humidifier.ca4",
               "deerma.humidifier.mjjsq",
+              "deerma.humidifier.jsq1",
               "deerma.humidifier.jsq4",
+              "deerma.humidifier.jsq5",
+              "deerma.humidifier.jsqs",
               "shuii.humidifier.jsq001"
             ],
             "default": "zhimi.humidifier.v1"
