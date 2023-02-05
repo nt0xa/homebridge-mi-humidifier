@@ -67,7 +67,7 @@ Add the following part to the "platforms" section of your [Homebridge config](ht
 | name                      | Name of the device. This will appear in your Home app.       | "Humidifier"             |
 | address                   | IP address of the device.                                    | —                        |
 | token                     | Device token. See [obtaining token](https://github.com/Maxmudjon/com.xiaomi-miio/blob/master/docs/obtain_token.md). | —                        |
-| model                     | One of:<br />- `zhimi.humidifier.v1`<br />- `zhimi.humidifier.ca1`<br />- `zhimi.humidifier.cb1`<br />- `zhimi.humidifier.ca4`<br />- `deerma.humidifier.mjjsq`<br />- `deerma.humidifier.jsq1`<br />- `deerma.humidifier.jsq3`<br />- `deerma.humidifier.jsq4`<br />- `deerma.humidifier.jsq5`<br />- `deerma.humidifier.jsqs`<br />- `shuii.humidifier.jsq001`<br />See [supported devices](#supported-devices) section for more details. | —                        |
+| model                     | One of:<br />- `zhimi.humidifier.v1`<br />- `zhimi.humidifier.ca1`<br />- `zhimi.humidifier.cb1`<br />- `zhimi.humidifier.ca4`<br />- `deerma.humidifier.mjjsq`<br />- `deerma.humidifier.jsq2w`<br />- `deerma.humidifier.jsq1`<br />- `deerma.humidifier.jsq3`<br />- `deerma.humidifier.jsq4`<br />- `deerma.humidifier.jsq5`<br />- `deerma.humidifier.jsqs`<br />- `shuii.humidifier.jsq001`<br />See [supported devices](#supported-devices) section for more details. | —                        |
 | updateInterval            | Device values update interval in seconds. This value affects how often data (humidity, temperature, etc.) from the device is updated. | 30                       |
 | disabled                  | Disable the devices. Can be used to temporary hide the device when it is not required without removing it from config. | false |
 | autoSwitchToHumidityMode  | Automatically switches mode to "humidity" when target humidity is changed. Affects models: <br /> - `zhimi.humidifier.{ca1,cb1,ca4}`<br /> - `deerma.humidifier.{mjjsq,jsq1,jsq001,jsqs,jsq3,jsq4,jsq5}` | false |
@@ -87,7 +87,7 @@ Add the following part to the "platforms" section of your [Homebridge config](ht
 
 ## Supported devices
 
-### Smartmi Humidifier 
+### Smartmi Humidifier
 
 Model: `zhimi.humidifier.v1`
 
@@ -126,6 +126,14 @@ Model: `deerma.humidifier.mjjsq` / `deerma.humidifier.jsq001`
 Model №: SCK0A45, ZNJSQ01DEM, MJJSQ03DY
 
 <img src="./.github/assets/deerma-humidifier-mjjsq.png" width="300px" />
+
+### Mi Smart Humidifier 2
+
+Model: `deerma.humidifier.jsq2w`
+
+Model №: MJJSQ05DY
+
+<img src="./.github/assets/deerma-humidifier-jsq2w.jpg" width="300px" />
 
 ### Mijia Pure Smart Humidifier
 
