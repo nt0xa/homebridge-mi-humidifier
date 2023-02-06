@@ -6,6 +6,7 @@ import { zhimiV1 } from "./zhimi-v1";
 import { zhimiCA1, zhimiCB1 } from "./zhimi-cab1";
 import { zhimiCA4 } from "./zhimi-ca4";
 import { deermaMJJSQ } from "./deerma-mjjsq";
+import { deermaJSQ2W as deermaJSQ2W } from "./deerma-jsq2w";
 import { deermaJSQ4 } from "./deerma-jsq4";
 import { deermaJSQ5 } from "./deerma-jsq5";
 import { shuiiJSQ001 } from "./shuii-jsq001";
@@ -31,6 +32,7 @@ export enum HumidifierModel {
   ZHIMI_CA4 = "zhimi.humidifier.ca4",
   DEERMA_MJJSQ = "deerma.humidifier.mjjsq",
   DEERMA_JSQ = "deerma.humidifier.jsq1",
+  DEERMA_JSQ2W = "deerma.humidifier.jsq2w",
   DEERMA_JSQ4 = "deerma.humidifier.jsq4",
   DEERMA_JSQ3 = "deerma.humidifier.jsq3",
   DEERMA_JSQ5 = "deerma.humidifier.jsq5",
@@ -45,6 +47,7 @@ export const HumidifierFactory = {
   [HumidifierModel.ZHIMI_CA4]: zhimiCA4,
   [HumidifierModel.DEERMA_MJJSQ]: deermaMJJSQ,
   [HumidifierModel.DEERMA_JSQ]: deermaMJJSQ,
+  [HumidifierModel.DEERMA_JSQ2W]: deermaJSQ2W,
   [HumidifierModel.DEERMA_JSQ4]: deermaJSQ4,
   [HumidifierModel.DEERMA_JSQ3]: deermaJSQ5,
   [HumidifierModel.DEERMA_JSQ5]: deermaJSQ5,
